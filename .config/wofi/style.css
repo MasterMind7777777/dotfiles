@@ -1,24 +1,52 @@
+@define-color base           #1E242F;
+@define-color blue_border    #2C9FB5;
+@define-color primary_yellow #B08130;
+@define-color base_alt       #282f3e;
+@define-color primary_blue   #b6c0cd;
+
+* {
+  font-family: "Overpass Nerd Font";
+  font-size: 16px;
+}
+
 window {
-    background-color: #1E1E2E;
-    border: 1px solid #5E81AC;
-    color: #ECEFF4;
-    font-family: "Fira Code";
-    font-size: 12pt;
+  border: 5px solid @blue_border;
+  border-radius: 20px;
 }
 
-entry {
-    background-color: #2E3440;
-    color: #ECEFF4;
-    border: 1px solid #5E81AC;
+#input {
+  margin-bottom: 15px;
+  padding: 3px;
+  border-radius: 5px;
+  border: none;
+  color: @primary_blue;
 }
 
-list {
-    background-color: #1E1E2E;
-    color: #ECEFF4;
+#inner-box {
+  background-color: @base_alt;
+  box-shadow: -4px -3px 45px 21px rgba(0, 0, 0, 0.35);
 }
 
-list > listitem:selected {
-    background-color: #3B4252;
-    color: #88C0D0;
-    border: 1px solid #81A1C1;
+#outer-box {
+  margin: 5px;
+  padding: 10px;
+  background-color: @base;
+  border-radius: 15px;
+}
+
+#text {
+  padding: 5px;
+  color: @primary_blue;
+}
+
+#entry {
+  padding: 10px;
+}
+
+#entry:nth-child(even) {
+  background-color: @base;
+}
+
+#entry:selected {
+  background-color: @primary_yellow;
 }
