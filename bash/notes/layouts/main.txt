@@ -1,0 +1,3 @@
+NOTE_2023-10-03_ToDo.md 631 858 525 287
+NOTE_2023-10-04_test_markdown.md 67 861 375 407
+NOTE_2023-10-06_fish_plugins.md 640 296 435 267

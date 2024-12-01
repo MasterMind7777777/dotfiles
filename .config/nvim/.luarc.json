@@ -1,0 +1,7 @@
+{
+    "diagnostics.globals": [
+        "vim",
+        "select_function_lsp",
+        "select_function_treesitter"
+    ]
+}
