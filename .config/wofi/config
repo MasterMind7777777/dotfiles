@@ -1,0 +1,18 @@
+[settings]
+# General settings
+prompt=Run:  # The prompt displayed at the top
+drun-icon-size=48  # Size of icons in drun mode
+
+# Theme settings
+font=Fira Code 12  # Font style and size
+background=#1E1E2E  # Background color
+border=#5E81AC  # Border color
+text=#ECEFF4  # Text color
+selected-background=#3B4252  # Background color for selected items
+selected-text=#88C0D0  # Text color for selected items
+selected-border=#81A1C1  # Border color for selected items
+
+# Behavior settings
+hide-on-run=true  # Hide Wofi after a selection is made
+sort-order=alphabetical  # Order items alphabetically
+
