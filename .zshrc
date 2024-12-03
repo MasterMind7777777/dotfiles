@@ -8,6 +8,9 @@ fi
 # Path to Oh My Zsh installation
 export ZSH="$HOME/.oh-my-zsh"
 
+
+setopt NO_BEEP
+
 # Add local binaries and custom paths
 # export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
@@ -33,6 +36,7 @@ source $ZSH/oh-my-zsh.sh
 # Enable Zsh's autocompletion system
 autoload -Uz compinit
 compinit
+
 
 # Additional completion tweaks
 zstyle ':completion:*' menu select                    # Enable menu-based completion
@@ -67,9 +71,15 @@ alias lt="exa --icons --tree"   # Display a tree view
 # shorhand aliases
 alias v="nvim"
 alias c="cd"
-newterm() {
-  kitty --detach --working-directory "$(pwd)"
+# function to git add all and commit with specified message
+gac() {
+  git add . && git commit -m "$1"
 }
+
+# move to bin
+# newterm() {
+#   kitty --detach --working-directory "$(pwd)"
+# }
 
 # --- Optional Settings ---
 # Uncomment the following as needed:
@@ -86,3 +96,4 @@ newterm() {
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+export PATH="$HOME/bin:$PATH"

@@ -30,3 +30,12 @@ vim.api.nvim_create_user_command("SourceInit", function()
 	-- Source the init.lua file
 	vim.cmd("source ~/.config/nvim/init.lua")
 end, {})
+
+-- Remap `]q` to go to the next quickfix item
+vim.keymap.set("n", "]q", ":cnext<CR>zz", { desc = "Next quickfix item" })
+
+-- Remap `[q` to go to the previous quickfix item
+vim.keymap.set("n", "[q", ":cprev<CR>zz", { desc = "Previous quickfix item" })
+
+-- Restart LSP with <leader>lr
+vim.keymap.set("n", "<leader>lr", ":LspRestart<CR>", { desc = "Restart LSP" })
