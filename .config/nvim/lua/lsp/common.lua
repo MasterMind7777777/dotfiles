@@ -18,7 +18,7 @@ M.on_attach = function(_, bufnr)
 	-- Show full diagnostic message in a floating window
 	nmap("gl", function()
 		-- Open a floating window with the diagnostics
-		vim.diagnostic.open_float(nil, { focusable = false })
+		vim.diagnostic.open_float(nil, { focusable = true, border = "rounded" })
 	end, "Show full diagnostic message")
 end
 
