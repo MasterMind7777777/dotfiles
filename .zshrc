@@ -97,3 +97,7 @@ gac() {
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
+export XDG_CURRENT_DESKTOP=Hyprland
+export XDG_SESSION_TYPE=wayland
+export XKB_DEFAULT_LAYOUT="us,ru"
+export XKB_DEFAULT_OPTIONS="grp:super_space_toggle"

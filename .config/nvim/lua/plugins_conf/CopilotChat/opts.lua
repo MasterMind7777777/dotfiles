@@ -19,6 +19,7 @@ local prompts = {
 
 local M = {
 	opts = {
+		model = "claude-3.5-sonnet",
 		question_header = "## User ",
 		answer_header = "## Copilot ",
 		error_header = "## Error ",
