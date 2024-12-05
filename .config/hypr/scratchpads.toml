@@ -1,0 +1,7 @@
+[scratchpads.term]
+command = "kitty --class scratchpad"
+class = "scratchpad"
+size = "80% 50%"
+animation = "fromTop"
+unfocus = "hide"
+
