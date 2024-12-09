@@ -5,7 +5,8 @@ require("mason-lspconfig").setup({
 })
 
 -- Load specific LSP configurations
-require("lsp.ts_ls")
+-- require("lsp.ts_ls")
+require("lsp.typescript-tools")
 require("lsp.lua_ls")
 
 -- Load null-ls for tools integrations
