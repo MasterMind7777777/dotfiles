@@ -39,3 +39,18 @@ vim.keymap.set("n", "[q", ":cprev<CR>zz", { desc = "Previous quickfix item" })
 
 -- Restart LSP with <leader>lr
 vim.keymap.set("n", "<leader>lr", ":LspRestart<CR>", { desc = "Restart LSP" })
+
+-- Paragraph selection without empty lines
+vim.keymap.set("v", "{", function()
+	vim.cmd("normal! {")
+	if vim.fn.line(".") ~= 1 then
+		vim.cmd("normal! j")
+	end
+end, { desc = "Move to previous paragraph without empty line" })
+
+vim.keymap.set("v", "}", function()
+	vim.cmd("normal! }")
+	if vim.fn.line(".") ~= vim.fn.line("$") then
+		vim.cmd("normal! k")
+	end
+end, { desc = "Move to next paragraph without empty line" })
