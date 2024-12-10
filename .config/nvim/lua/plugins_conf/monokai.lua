@@ -49,6 +49,10 @@ function M.setup()
     highlight NormalFloat guibg=#1f2335 guifg=#ffffff
     highlight FloatBorder guibg=#1f2335 guifg=#ff79c6
 ]])
+
+	vim.cmd([[
+  highlight @markup.raw.block.markdown guibg=NONE ctermbg=NONE
+]])
 end
 
 return M

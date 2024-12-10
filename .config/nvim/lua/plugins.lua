@@ -193,6 +193,9 @@ return {
 		---@module "ibl"
 		---@type ibl.config
 		opts = {},
+		config = function()
+			require("plugins_conf.indent-blankline").setup()
+		end,
 	},
 
 	{
