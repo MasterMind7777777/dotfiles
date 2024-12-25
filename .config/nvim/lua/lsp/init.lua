@@ -1,7 +1,7 @@
 -- Mason setup (LSP installer)
 require("mason").setup()
 require("mason-lspconfig").setup({
-	ensure_installed = { "ts_ls", "lua_ls" },
+	ensure_installed = { "ts_ls", "lua_ls", "rust_analyzer" },
 })
 
 -- Load specific LSP configurations
