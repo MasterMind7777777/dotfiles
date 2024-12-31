@@ -54,3 +54,5 @@ vim.keymap.set("v", "}", function()
 		vim.cmd("normal! k")
 	end
 end, { desc = "Move to next paragraph without empty line" })
+
+vim.keymap.set("n", "<Leader>fs", ":w<CR>", { noremap = true, silent = true })
