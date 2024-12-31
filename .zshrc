@@ -95,10 +95,13 @@ gac() {
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
+
 export PATH="$BUN_INSTALL/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="/usr/bin:$PATH"
+export PATH="$HOME/.emacs.d/bin:$PATH"
+
 export XDG_CURRENT_DESKTOP=Hyprland
 export XDG_SESSION_TYPE=wayland
 export XKB_DEFAULT_LAYOUT="us,ru"

@@ -198,6 +198,14 @@ return {
 	},
 
 	{
+		"tpope/vim-fugitive",
+		cmd = "Git",
+		keys = {
+			{ "<Leader>gg", ":Git<CR>", desc = "Open Fugitive Git" },
+		},
+	},
+
+	{
 		"folke/trouble.nvim",
 		opts = {}, -- for default options, refer to the configuration section for custom setup.
 		cmd = "Trouble",

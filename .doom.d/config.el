@@ -19,15 +19,15 @@
 ;; - `doom-serif-font' -- for the `fixed-pitch-serif' face
 ;;
 ;; Set the primary font for Doom
-(setq doom-font (font-spec :family "Hack Nerd Font" :size 16 :weight 'regular)
+(setq doom-font (font-spec :family "Hack Nerd Font" :size 22 :weight 'regular)
       ;; Non-monospace font for UI elements
-      doom-variable-pitch-font (font-spec :family "Hack Nerd Font" :size 16)
+      doom-variable-pitch-font (font-spec :family "Hack Nerd Font" :size 22)
       ;; For presentations or streaming
       doom-big-font (font-spec :family "Hack Nerd Font" :size 20))
 
 ;; Optional: Set additional fonts for symbols and serif text
-(setq doom-symbol-font (font-spec :family "Hack Nerd Font" :size 16)
-      doom-serif-font (font-spec :family "Hack Nerd Font" :size 16))
+(setq doom-symbol-font (font-spec :family "Hack Nerd Font" :size 22)
+      doom-serif-font (font-spec :family "Hack Nerd Font" :size 22))
 ;;
 ;; See 'C-h v doom-font' for documentation and more examples of what they
 ;; accept. For example:
@@ -43,7 +43,7 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-one)
+(setq doom-theme 'doom-vibrant)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -156,8 +156,30 @@
 (setq copilot-indentation-alist
       '((emacs-lisp-mode 2)
         (lisp-interaction-mode 2) ;; For the scratch buffer and REPL
-        (t . 2))) ;; Default fallback for all other modes
+        (python-mode 2)           ;; Python indentation
+        (js-mode 2)               ;; JavaScript
+        (typescript-mode 2)       ;; TypeScript
+        (typescript-ts-mode 2)    ;; Tree-sitter TypeScript mode
+        (c-mode 2)                ;; C
+        (c++-mode 2)              ;; C++
+        (sh-mode 2)))             ;; Shell scripts
   ;; Bind Copilot functions
   (map! :i "C-<tab>" #'copilot-accept-completion                ;; Accept entire suggestion
         :i "C-<iso-lefttab>" #'copilot-accept-completion-by-word;; Accept suggestion word-by-word
         :i "C-c C-f" #'copilot-complete))
+
+(use-package! org-roam
+  :init
+  (setq org-roam-directory (expand-file-name "~/org-roam"))
+  :config
+  (org-roam-db-autosync-mode))
+
+
+(use-package! lsp-mode
+  :hook ((typescript-ts-mode typescript-mode
+          js-ts-mode js-mode) . lsp)
+  :commands lsp)
+
+(after! company
+  (setq company-idle-delay 0.2          ;; Trigger completions instantly
+        company-minimum-prefix-length 1)) ;; Trigger completions with a single character
