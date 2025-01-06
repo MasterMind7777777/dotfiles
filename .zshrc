@@ -56,6 +56,7 @@ bindkey '^N' down-line-or-search  # Search history with down arrow
 # --- User Configuration ---
 # Preferred editor for local and remote sessions
 export EDITOR='nvim'
+export VISUAL='nvim'
 
 # Add personal aliases here or in $ZSH_CUSTOM/aliases.zsh
 # alias zshconfig="nvim ~/.zshrc"
@@ -71,6 +72,8 @@ alias lt="exa --icons --tree"   # Display a tree view
 # shorhand aliases
 alias v="nvim"
 alias c="cd"
+alias vpnc="/home/mastermind/dotfiles/bash/misc/vpn_connect.sh"
+alias vpnd="/home/mastermind/dotfiles/bash/misc/vpn_disconnect.sh"
 # function to git add all and commit with specified message
 gac() {
   git add . && git commit -m "$1"
