@@ -93,6 +93,14 @@ return {
 	{ "williamboman/mason-lspconfig.nvim" },
 
 	{
+		"Wansmer/symbol-usage.nvim",
+		event = "BufReadPre", -- need run before LspAttach if you use nvim 0.9. On 0.10 use 'LspAttach'
+		config = function(_, opts)
+			require("plugins_conf.symbol-usage").setup()
+		end,
+	},
+
+	{
 		"pmizio/typescript-tools.nvim",
 		dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
 		opts = {},
