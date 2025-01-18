@@ -72,6 +72,7 @@ alias lt="exa --icons --tree"   # Display a tree view
 # shorhand aliases
 alias v="nvim"
 alias c="cd"
+alias lp="~/dotfiles/bash/hyperland/load-project.sh"
 alias vpnc="/home/mastermind/dotfiles/bash/misc/vpn_connect.sh"
 alias vpnd="/home/mastermind/dotfiles/bash/misc/vpn_disconnect.sh"
 # function to git add all and commit with specified message
@@ -110,4 +111,3 @@ export PATH="$HOME/.cargo/bin:$PATH"
 export XDG_CURRENT_DESKTOP=Hyprland
 export XDG_SESSION_TYPE=wayland
 export XKB_DEFAULT_LAYOUT="us,ru"
-export XKB_DEFAULT_OPTIONS="grp:super_space_toggle"
