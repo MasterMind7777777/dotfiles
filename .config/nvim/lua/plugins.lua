@@ -33,9 +33,10 @@ return {
 	},
 
 	{
-		"loctvl842/monokai-pro.nvim",
+		"ellisonleao/gruvbox.nvim",
+		priority = 1000, -- Ensure it loads before everything else
 		config = function()
-			require("plugins_conf.monokai").setup()
+			require("plugins_conf.gruvbox").setup()
 		end,
 	},
 
@@ -104,6 +105,13 @@ return {
 		"pmizio/typescript-tools.nvim",
 		dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
 		opts = {},
+	},
+
+	{
+		"dmmulroy/tsc.nvim",
+		config = function()
+			require("tsc").setup()
+		end,
 	},
 
 	{

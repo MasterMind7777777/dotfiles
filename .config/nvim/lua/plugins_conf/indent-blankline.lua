@@ -1,19 +1,15 @@
 local M = {}
 
 M.setup = function()
-	-- local highlight = {
-	-- 	"IblIndent",
-	-- 	"IblScope",
-	-- }
-
 	local hooks = require("ibl.hooks")
-	-- create the highlight groups in the highlight setup hook, so they are reset
-	-- every time the colorscheme changes
+
+	-- Register Gruvbox colors
 	hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
-		vim.api.nvim_set_hl(0, "IblScope", { fg = "#A1D372" })
-		vim.api.nvim_set_hl(0, "IblIndent", { fg = "#727072" })
+		vim.api.nvim_set_hl(0, "IblScope", { fg = "#fabd2f" }) -- Gruvbox yellow
+		vim.api.nvim_set_hl(0, "IblIndent", { fg = "#504945" }) -- Gruvbox dark gray
 	end)
 
+	-- Apply the configuration
 	require("ibl").setup()
 end
 
