@@ -75,6 +75,10 @@ alias c="cd"
 alias lp="~/dotfiles/bash/hyperland/load-project.sh"
 alias vpnc="/home/mastermind/dotfiles/bash/misc/vpn_connect.sh"
 alias vpnd="/home/mastermind/dotfiles/bash/misc/vpn_disconnect.sh"
+alias treecp="tree -I 'node_modules|dist|target' | wl-copy"
+alias ssh='kitty +kitten ssh'
+alias kthemes='kitty +kitten themes'
+
 # function to git add all and commit with specified message
 gac() {
   git add . && git commit -m "$1"

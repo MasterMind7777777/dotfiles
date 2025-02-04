@@ -1,5 +1,3 @@
--- File: lua/config/symbol_usage.lua
-
 local M = {}
 
 M.setup = function()
@@ -86,14 +84,13 @@ M.setup = function()
 		return res
 	end
 
-	-- Setup symbol-usage with the custom text format
-	require("symbol-usage").setup({
-		text_format = text_format,
-		-- You can add more configuration options here as needed
-	})
+	-- Only call setup() without arguments
+	require("symbol-usage").setup()
+
+	-- Manually apply text format (since it cannot be set in setup)
+	vim.g.symbol_usage_text_format = text_format
 
 	-- Optional: Define additional highlight groups via vim.cmd if necessary
-	-- For example:
 	-- vim.cmd([[
 	--   highlight SymbolUsageRounding guifg=#yourcolor guibg=NONE gui=italic
 	--   highlight SymbolUsageContent guifg=#yourcolor guibg=#anothercolor gui=italic
