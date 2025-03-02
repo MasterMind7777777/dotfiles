@@ -56,3 +56,35 @@ vim.keymap.set("v", "}", function()
 end, { desc = "Move to next paragraph without empty line" })
 
 vim.keymap.set("n", "<Leader>fs", ":w<CR>", { noremap = true, silent = true })
+
+-- Append the entire content of the current file to ~/context.md
+vim.api.nvim_set_keymap(
+	"n",
+	"<leader>ll",
+	":lua require('custom.context').append_current_file()<CR>",
+	{ noremap = true, silent = true, desc = "Append current file to context" }
+)
+
+-- Append the function at/above cursor (Tree-sitter) to ~/context.md
+vim.api.nvim_set_keymap(
+	"n",
+	"<leader>lf",
+	":lua require('custom.context').append_function_treesitter()<CR>",
+	{ noremap = true, silent = true, desc = "Append function (TS) to context" }
+)
+
+-- Open the context file
+vim.api.nvim_set_keymap(
+	"n",
+	"<leader>lo",
+	":lua require('custom.context').open_context()<CR>",
+	{ noremap = true, silent = true, desc = "Open context file" }
+)
+
+-- Copy the entire context file to your system clipboard
+vim.api.nvim_set_keymap(
+	"n",
+	"<leader>lc",
+	":lua require('custom.context').copy_context()<CR>",
+	{ noremap = true, silent = true, desc = "Copy entire context file" }
+)
