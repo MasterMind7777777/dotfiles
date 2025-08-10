@@ -78,6 +78,7 @@ alias vpnd="/home/mastermind/dotfiles/bash/misc/vpn_disconnect.sh"
 alias treecp="tree -I 'node_modules|dist|target' | wl-copy"
 alias ssh='kitty +kitten ssh'
 alias kthemes='kitty +kitten themes'
+alias vial='/home/mastermind/app_image_lib/Vial-v0.7.1-x86_64.AppImage'
 
 # function to git add all and commit with specified message
 gac() {

@@ -19,7 +19,7 @@ local prompts = {
 
 local M = {
 	opts = {
-		model = "gpt-4o",
+		model = "claude-3.7-sonnet",
 		question_header = "## User ",
 		answer_header = "## Copilot ",
 		error_header = "## Error ",
