@@ -1,0 +1,608 @@
+// Arch + niri config mirroring your Hyprland behaviors.
+
+// ───────────────────────────────────────────────────────────────────────────────
+// INPUT
+// ───────────────────────────────────────────────────────────────────────────────
+input {
+    keyboard {
+        xkb {
+            layout "us,ru"
+            options "grp:win_space_toggle"
+        }
+        numlock
+    }
+    touchpad {
+        tap
+        // natural-scroll  ← omit to keep it disabled
+    }
+
+    // Optional: move pointer to newly focused window (center).
+    warp-mouse-to-focus mode="center-xy"
+
+    // Optional: classic Focus-Follows-Mouse (FFM).
+    // If you enable it, the 0% threshold avoids focusing windows that are barely visible.
+    focus-follows-mouse max-scroll-amount="0%"
+}
+
+// ───────────────────────────────────────────────────────────────────────────────
+// ENVIRONMENT & CURSOR
+// ───────────────────────────────────────────────────────────────────────────────
+environment {
+    XDG_CURRENT_DESKTOP "niri"
+    XDG_SESSION_TYPE "wayland"
+
+    GDK_BACKEND "wayland"
+    MOZ_ENABLE_WAYLAND "1"
+    ELECTRON_OZONE_PLATFORM_HINT "wayland"
+
+    GTK_THEME "gruvbox-dark-gtk"
+    QT_QPA_PLATFORMTHEME "qt5ct"
+    QT_STYLE_OVERRIDE "kvantum"
+
+    XCURSOR_THEME "phinger-cursors-gruvbox-material"
+    XCURSOR_SIZE "14"
+}
+
+cursor {
+    xcursor-theme "phinger-cursors-gruvbox-material"
+    xcursor-size 14
+
+    // Popular polish:
+    hide-when-typing
+    hide-after-inactive-ms 1200
+}
+
+// ───────────────────────────────────────────────────────────────────────────────
+// LAYOUT / LOOK & FEEL
+// ───────────────────────────────────────────────────────────────────────────────
+layout {
+    gaps 16
+    center-focused-column "never"
+
+  preset-column-widths {
+    proportion 0.33333
+    proportion 0.5
+    proportion 0.66667
+    proportion 1.0
+  }
+
+  preset-window-heights {
+    proportion 0.33333
+    proportion 0.5
+    proportion 0.66667
+    proportion 1.0
+  }
+
+    default-column-width {
+        proportion 0.5
+    }
+
+    focus-ring {
+        off
+        width 4
+        active-color "#7fc8ff"
+        inactive-color "#505050"
+    }
+
+    // border is optional; focus-ring already gives you a highlight.
+    border {
+      
+    active-gradient from="#8caaee" to="#f4b8e4" angle=135 relative-to="workspace-view"
+    inactive-gradient from="#8e7ab5" to="#756ab6" angle=135 relative-to="workspace-view" in="oklch shorter hue"
+    width 3
+  }
+
+    shadow {
+        on
+        softness 30
+        spread 5
+        offset x=0 y=5
+        color "#0007"
+    }
+}
+
+gestures {
+    hot-corners {
+        off
+    }
+}
+
+// Built-in screenshot target (you also bind your swappy script on Print)
+screenshot-path "~/Pictures/Screenshots/Screenshot %Y-%m-%d %H-%M-%S.png"
+
+// ───────────────────────────────────────────────────────────────────────────────
+// OUTPUTS (monitors) — mirrors your Hyprland monitor layout
+// eDP-1 at (1200,720); DP-2 rotated 90° at (0,0); DP-1 & DP-3 disabled
+// ───────────────────────────────────────────────────────────────────────────────
+output "eDP-1" {
+    position x=1200 y=720
+    focus-at-startup
+}
+
+output "DP-2" {
+    transform "90"
+    position x=0 y=0
+}
+
+output "DP-1" {
+    off
+}
+
+output "DP-3" {
+    off
+}
+
+// ───────────────────────────────────────────────────────────────────────────────
+// NAMED WORKSPACES — 1–10 on eDP‑1, 11–20 on DP‑2, plus "magic"
+// (all expanded; no inline braces)
+// ───────────────────────────────────────────────────────────────────────────────
+workspace "1" {
+    open-on-output "eDP-1"
+}
+workspace "2" {
+    open-on-output "eDP-1"
+}
+workspace "3" {
+    open-on-output "eDP-1"
+}
+workspace "4" {
+    open-on-output "eDP-1"
+}
+workspace "5" {
+    open-on-output "eDP-1"
+}
+workspace "6" {
+    open-on-output "eDP-1"
+}
+workspace "7" {
+    open-on-output "eDP-1"
+}
+workspace "8" {
+    open-on-output "eDP-1"
+}
+workspace "9" {
+    open-on-output "eDP-1"
+}
+workspace "10" {
+    open-on-output "eDP-1"
+}
+
+workspace "11" {
+    open-on-output "DP-2"
+}
+workspace "12" {
+    open-on-output "DP-2"
+}
+workspace "13" {
+    open-on-output "DP-2"
+}
+workspace "14" {
+    open-on-output "DP-2"
+}
+workspace "15" {
+    open-on-output "DP-2"
+}
+workspace "16" {
+    open-on-output "DP-2"
+}
+workspace "17" {
+    open-on-output "DP-2"
+}
+workspace "18" {
+    open-on-output "DP-2"
+}
+workspace "19" {
+    open-on-output "DP-2"
+}
+workspace "20" {
+    open-on-output "DP-2"
+}
+
+workspace "ndrop"
+
+// Hidden parking workspaces per-output for non-disruptive scratchpad hiding
+// (removed hidden workspaces; using tdrop for dropdown behavior)
+
+// ───────────────────────────────────────────────────────────────────────────────
+// AUTOSTART (Hyprland exec-once equivalents)
+// ───────────────────────────────────────────────────────────────────────────────
+spawn-at-startup "waybar"
+spawn-at-startup "clipse" "-listen"
+spawn-at-startup "bash" "-lc" "sleep 0.3; dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XDG_RUNTIME_DIR; systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XDG_RUNTIME_DIR; systemctl --user restart kitty-keepalive.service"
+spawn-at-startup "bash" "-lc" "exec /usr/bin/slack --enable-features=UseOzonePlatform,WebRTCPipeWireCapturer,WaylandWindowDecorations --ozone-platform=wayland"
+
+// ───────────────────────────────────────────────────────────────────────────────
+// WINDOW RULES (float/size/placement like your Hyprland rules)
+// ───────────────────────────────────────────────────────────────────────────────
+window-rule {
+  geometry-corner-radius 10
+  clip-to-geometry true
+}
+
+window-rule {
+    match app-id=r#"(?i)^slack$"#
+    open-on-workspace "3"
+}
+
+// Ensure Google Chrome opens with full-width columns by default
+window-rule {
+    match app-id=r#"(?i)^(google-chrome|com\.google\.Chrome)$"#
+    default-column-width {
+        proportion 1.0
+    }
+}
+
+window-rule {
+    match app-id=r#"^kitty-park$"#
+    open-on-workspace "ndrop"
+}
+
+
+window-rule {
+    match app-id=r#"^clipse$"#
+    open-floating true
+    default-column-width {
+        fixed 622
+    }
+    default-window-height {
+        fixed 652
+    }
+    default-floating-position x=16 y=16 relative-to="top-right"
+}
+
+window-rule {
+    match app-id=r#"^com\.github\.Aylur\.ags$"#
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
+    open-floating true
+    default-floating-position x=32 y=32 relative-to="bottom-left"
+}
+
+// Dropdown scratchpad: launch with `kitty --class scratchpad`
+window-rule {
+    match app-id=r#"^scratchpad-term$"#
+    open-floating true
+    default-window-height {
+        proportion 0.5
+    }
+    default-column-width {
+        proportion 0.8
+    }
+    default-floating-position x=0 y=0 relative-to="top"
+}
+
+// Prevent apps forcing maximize (similar to Hypr’s suppressevent)
+window-rule {
+    open-maximized false
+}
+
+// ───────────────────────────────────────────────────────────────────────────────
+// KEY BINDS (mirrors Hypr muscle‑memory)
+// ───────────────────────────────────────────────────────────────────────────────
+binds {
+    Mod+Shift+Slash {
+        show-hotkey-overlay
+    }
+
+    Mod+Return {
+        spawn "kitty" "--single-instance" "--instance-group" "keepalive" "-o" "confirm_os_window_close=0"
+    }
+    Mod+D {
+        spawn "wofi" "--show" "drun"
+    }
+    Mod+Q {
+        close-window
+    }
+
+
+    // Clipse (kitty --class clipse -e clipse)
+    Mod+V {
+        spawn "kitty" "--single-instance" "--instance-group" "keepalive" "--class" "clipse" "-e" "clipse"
+    }
+
+    // Screenshots
+    // Interactive selection UI; press Ctrl+C inside the UI to copy without writing.
+    Print { screenshot; }
+
+    // Overview
+    Mod+O repeat=false {
+        toggle-overview
+    }
+
+    // Fullscreen / maximize
+    Mod+F {
+        maximize-column
+    }
+    Mod+Shift+F {
+        fullscreen-window
+    }
+    Mod+Ctrl+F {
+        expand-column-to-available-width
+    }
+
+    // Centering
+    Mod+C {
+        center-column
+    }
+    Mod+Ctrl+C {
+        center-visible-columns
+    }
+
+    // Resize amounts
+    Mod+Minus {
+        set-column-width "-10%"
+    }
+    Mod+Equal {
+        set-column-width "+10%"
+    }
+    Mod+Shift+Minus {
+        set-window-height "-10%"
+    }
+    Mod+Shift+Equal {
+        set-window-height "+10%"
+    }
+
+    // Scratchpad terminal: kitty + tmux session "scratchpad"
+    // Matches window-rule app-id "scratchpad-term" (opens on hidden workspace "ndrop")
+    Mod+S {
+        spawn "kitty" "--class" "scratchpad-term" "--single-instance" "--instance-group" "keepalive" "-e" "tmux" "new" "-A" "-s" "scratchpad"
+    }
+    // Floating toggle + focus swap
+    Mod+Shift+V {
+        switch-focus-between-floating-and-tiling
+    }
+
+    // Navigation (hjkl)
+    // Cross monitors when you hit the edge
+    Mod+H { 
+    focus-column-or-monitor-left 
+  }
+    Mod+L {
+    focus-column-or-monitor-right
+  }
+    Mod+J {
+    focus-window-down
+  }
+    Mod+K {
+    focus-window-up
+  }
+
+    // Move column/window
+    Mod+Shift+h {
+        move-column-left
+    }
+    Mod+Shift+l {
+        move-column-right
+    }
+    Mod+Shift+j {
+        move-window-down
+    }
+    Mod+Shift+k {
+        move-window-up
+    }
+
+    // Workspace scrolling
+    Mod+Page_Down {
+        focus-workspace-down
+    }
+    Mod+Page_Up {
+        focus-workspace-up
+    }
+    Mod+U {
+        focus-workspace-down
+    }
+    Mod+I {
+        focus-workspace-up
+    }
+
+    Mod+Ctrl+Page_Down {
+        move-column-to-workspace-down
+    }
+    Mod+Ctrl+Page_Up {
+        move-column-to-workspace-up
+    }
+    Mod+Ctrl+U {
+        move-column-to-workspace-down
+    }
+    Mod+Ctrl+I {
+        move-column-to-workspace-up
+    }
+
+    // Workspaces 1..10 (eDP-1)
+    Mod+1 {
+        focus-workspace "1"
+    }
+    Mod+2 {
+        focus-workspace "2"
+    }
+    Mod+3 {
+        focus-workspace "3"
+    }
+    Mod+4 {
+        focus-workspace "4"
+    }
+    Mod+5 {
+        focus-workspace "5"
+    }
+    Mod+6 {
+        focus-workspace "6"
+    }
+    Mod+7 {
+        focus-workspace "7"
+    }
+    Mod+8 {
+        focus-workspace "8"
+    }
+    Mod+9 {
+        focus-workspace "9"
+    }
+    Mod+0 {
+        focus-workspace "10"
+    }
+
+    Mod+Shift+1 {
+        move-column-to-workspace "1"
+    }
+    Mod+Shift+2 {
+        move-column-to-workspace "2"
+    }
+    Mod+Shift+3 {
+        move-column-to-workspace "3"
+    }
+    Mod+Shift+4 {
+        move-column-to-workspace "4"
+    }
+    Mod+Shift+5 {
+        move-column-to-workspace "5"
+    }
+    Mod+Shift+6 {
+        move-column-to-workspace "6"
+    }
+    Mod+Shift+7 {
+        move-column-to-workspace "7"
+    }
+    Mod+Shift+8 {
+        move-column-to-workspace "8"
+    }
+    Mod+Shift+9 {
+        move-column-to-workspace "9"
+    }
+    Mod+Shift+0 {
+        move-column-to-workspace "10"
+    }
+
+    // F1..F10 = 11..20 (DP-2)
+    Mod+F1 {
+        focus-workspace "11"
+    }
+    Mod+F2 {
+        focus-workspace "12"
+    }
+    Mod+F3 {
+        focus-workspace "13"
+    }
+    Mod+F4 {
+        focus-workspace "14"
+    }
+    Mod+F5 {
+        focus-workspace "15"
+    }
+    Mod+F6 {
+        focus-workspace "16"
+    }
+    Mod+F7 {
+        focus-workspace "17"
+    }
+    Mod+F8 {
+        focus-workspace "18"
+    }
+    Mod+F9 {
+        focus-workspace "19"
+    }
+    Mod+F10 {
+        focus-workspace "20"
+    }
+
+    Mod+Shift+F1 {
+        move-column-to-workspace "11"
+    }
+    Mod+Shift+F2 {
+        move-column-to-workspace "12"
+    }
+    Mod+Shift+F3 {
+        move-column-to-workspace "13"
+    }
+    Mod+Shift+F4 {
+        move-column-to-workspace "14"
+    }
+    Mod+Shift+F5 {
+        move-column-to-workspace "15"
+    }
+    Mod+Shift+F6 {
+        move-column-to-workspace "16"
+    }
+    Mod+Shift+F7 {
+        move-column-to-workspace "17"
+    }
+    Mod+Shift+F8 {
+        move-column-to-workspace "18"
+    }
+    Mod+Shift+F9 {
+        move-column-to-workspace "19"
+    }
+    Mod+Shift+F10 {
+        move-column-to-workspace "20"
+    }
+
+    // Column/stack equivalents
+    Mod+BracketLeft {
+        consume-or-expel-window-left
+    }
+    Mod+BracketRight {
+        consume-or-expel-window-right
+    }
+    Mod+Comma {
+        consume-window-into-column
+    }
+    Mod+Period {
+        expel-window-from-column
+    }
+
+    // Media / brightness
+    XF86AudioRaiseVolume allow-when-locked=true {
+        spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+"
+    }
+    XF86AudioLowerVolume allow-when-locked=true {
+        spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-"
+    }
+    XF86AudioMute allow-when-locked=true {
+        spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"
+    }
+    XF86AudioMicMute allow-when-locked=true {
+        spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"
+    }
+    XF86AudioNext {
+        spawn "playerctl" "next"
+    }
+    XF86AudioPrev {
+        spawn "playerctl" "previous"
+    }
+    XF86AudioPlay {
+        spawn "playerctl" "play-pause"
+    }
+    XF86AudioPause {
+        spawn "playerctl" "play-pause"
+    }
+
+    XF86MonBrightnessUp {
+        spawn "brightnessctl" "s" "10%+"
+    }
+    XF86MonBrightnessDown {
+        spawn "brightnessctl" "s" "10%-"
+    }
+
+    // Exit
+    Mod+Shift+E {
+        quit
+    }
+    Ctrl+Alt+Delete {
+        quit
+    }
+}
+
+// Make apps prefer server-side decorations where possible (niri rings/borders).
+prefer-no-csd
+
+// Overview sizing/backdrop (tweak to taste).
+overview {
+    zoom 0.35
+    backdrop-color "#1d2021"
+}
+
+// Don't show the hotkey help at startup (you already have a bind to open it).
+hotkey-overlay {
+    skip-at-startup
+}
