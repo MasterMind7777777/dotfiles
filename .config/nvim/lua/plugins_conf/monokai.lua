@@ -35,8 +35,9 @@ function M.setup()
 		},
 	})
 
-	vim.cmd([[colorscheme monokai-pro]])
-	vim.cmd("set cursorline")
+    -- colorscheme monokai-pro disabled in favor of mastermind
+    -- vim.cmd([[colorscheme monokai-pro]])
+    vim.cmd("set cursorline")
 
 	-- Customize line numbers to match Monokai Pro style
 	vim.cmd([[

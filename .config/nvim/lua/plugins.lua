@@ -184,6 +184,12 @@ return {
 		end,
 	},
 
+	-- Lush: Theme authoring DSL (+ :Lushify live preview)
+	{
+		"rktjmp/lush.nvim",
+		lazy = false, -- ensure available for colorscheme at startup
+	},
+
 	{
 		"kristijanhusak/vim-dadbod-ui",
 		dependencies = {
