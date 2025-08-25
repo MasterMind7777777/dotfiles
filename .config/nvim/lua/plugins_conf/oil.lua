@@ -140,20 +140,8 @@ M.setup = function()
 			border = "rounded",
 		},
 	})
-	vim.cmd([[
-" Oil highlights with Gruvbox color palette
-
-highlight OilDir guifg=#fabd2f guibg=NONE gui=bold           " Directories in an oil buffer (Gruvbox Yellow)
-highlight OilDirIcon guifg=#fabd2f guibg=NONE gui=bold       " Icon for directories (Gruvbox Yellow)
-highlight OilSocket guifg=#ebdbb2 guibg=NONE gui=italic      " Socket files in an oil buffer (Gruvbox Light)
-highlight OilLink guifg=#83a598 guibg=NONE gui=italic       " Soft links in an oil buffer (Gruvbox Aqua)
-highlight OilFile guifg=#ebdbb2 guibg=NONE gui=NONE         " Normal files in an oil buffer (Gruvbox Light)
-highlight OilCreate guifg=#b8bb26 guibg=NONE gui=bold       " Create action in the oil preview window (Gruvbox Green)
-highlight OilDelete guifg=#fb4934 guibg=NONE gui=bold       " Delete action in the oil preview window (Gruvbox Red)
-highlight OilMove guifg=#fabd2f guibg=NONE gui=bold         " Move action in the oil preview window (Gruvbox Yellow)
-highlight OilCopy guifg=#83a598 guibg=NONE gui=bold         " Copy action in the oil preview window (Gruvbox Aqua)
-highlight OilChange guifg=#d3869b guibg=NONE gui=bold       " Change action in the oil preview window (Gruvbox Purple)
-  ]])
+	-- Highlights moved to theme (lua/lush_theme/mastermind.lua)
+	-- vim.cmd([[ ... disabled Gruvbox-tone oil highlights ... ]])
 end
 
 return M
