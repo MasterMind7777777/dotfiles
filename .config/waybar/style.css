@@ -3,7 +3,8 @@
 * {
   border: none;
   border-radius: 10px;
-  font-family: "JetbrainsMono Nerd Font";
+  /* Prefer a clean, modern sans; keep Nerd Font for icons */
+  font-family: "Inter", "IBM Plex Sans", "Manrope", "JetBrainsMono Nerd Font", "Symbols Nerd Font", "Noto Color Emoji", sans-serif;
   font-size: 15px;
   min-height: 10px;
 }
@@ -21,7 +22,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: @surface0;
+  background: alpha(@surface0, 0.60);
   color: @neon-magenta;
   border-bottom: 3px;
   border-style: solid;
@@ -31,7 +32,7 @@ window#waybar {
 
 #window:hover, #niri-window:hover {
   color: @base;
-  background: @neon-magenta;
+  background: alpha(@neon-magenta, 0.85);
 }
 
 #network {
@@ -42,7 +43,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: @surface0;
+  background: alpha(@surface0, 0.60);
   color: @neon-cyan;
   border-bottom: 3px;
   border-style: solid;
@@ -52,7 +53,7 @@ window#waybar {
 
 #network:hover {
   color: @base;
-  background: @neon-cyan;
+  background: alpha(@neon-cyan, 0.85);
 }
 
 #cava {
@@ -63,7 +64,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: @surface0;
+  background: alpha(@surface0, 0.60);
   color: @neon-green;
   border-bottom: 3px;
   border-style: solid;
@@ -73,7 +74,7 @@ window#waybar {
 
 #cava:hover {
   color: @base;
-  background: @neon-green;
+  background: alpha(@neon-green, 0.85);
 }
 
 #battery {
@@ -84,7 +85,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: @surface0;
+  background: alpha(@surface0, 0.60);
   color: @neon-orange;
   border-bottom: 3px;
   border-style: solid;
@@ -94,12 +95,12 @@ window#waybar {
 
 #battery:hover {
   color: @base;
-  background: @neon-orange;
+  background: alpha(@neon-orange, 0.85);
 }
 
 #backlight:hover {
   color: @base;
-  background: @neon-purple;
+  background: alpha(@neon-purple, 0.85);
 }
 
 #backlight {
@@ -110,7 +111,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: @surface0;
+  background: alpha(@surface0, 0.60);
   color: @neon-purple;
   border-bottom: 3px;
   border-style: solid;
@@ -126,7 +127,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: @surface0;
+  background: alpha(@surface0, 0.60);
   color: @neon-pink;
   border-bottom: 3px;
   border-style: solid;
@@ -136,7 +137,7 @@ window#waybar {
 
 #language:hover {
   color: @base;
-  background: @neon-pink;
+  background: alpha(@neon-pink, 0.85);
 }
 
 #pulseaudio {
@@ -147,7 +148,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: @surface0;
+  background: alpha(@surface0, 0.60);
   color: @neon-blue;
   padding: 8px;
   border-bottom: 3px;
@@ -157,13 +158,13 @@ window#waybar {
 }
 
 #pulseaudio:hover {
-  background: @neon-blue;
+  background: alpha(@neon-blue, 0.85);
   color: @base;
 }
 
 #pulseaudio.muted {
   color: @neon-red;
-  background: @surface0;
+  background: alpha(@surface0, 0.60);
   border-bottom: 3px;
   border-style: solid;
   border-color: @neon-red;
@@ -171,7 +172,7 @@ window#waybar {
 }
 
 #pulseaudio.muted:hover {
-  background: @neon-red;
+  background: alpha(@neon-red, 0.85);
   color: @base;
 
 }
@@ -184,7 +185,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: @surface0;
+  background: alpha(@surface0, 0.60);
   color: @neon-yellow;
   border-bottom: 3px;
   border-style: solid;
@@ -194,7 +195,7 @@ window#waybar {
 
 #clock:hover {
   color: @base;
-  background: @neon-yellow;
+  background: alpha(@neon-yellow, 0.85);
 }
 
 #disk {
@@ -205,7 +206,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: @surface0;
+  background: alpha(@surface0, 0.60);
   color: @neon-purple;
   border-bottom: 3px;
   border-style: solid;
@@ -215,7 +216,7 @@ window#waybar {
 
 #disk:hover {
   color: @base;
-  background: @neon-purple;
+  background: alpha(@neon-purple, 0.85);
 }
 
 #privacy {
@@ -226,7 +227,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: @surface0;
+  background: alpha(@surface0, 0.60);
   color: @overlay0;
   border-bottom: 3px;
   border-style: solid;
@@ -242,7 +243,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: @surface0;
+  background: alpha(@surface0, 0.60);
   color: @overlay2;
   border-bottom: 3px;
   border-style: solid;
@@ -256,7 +257,7 @@ window#waybar {
 }
 
 #idle_inhibitor.activated:hover {
-  background: @neon-cyan;
+  background: alpha(@neon-cyan, 0.85);
   color: @base;
   border-color: @neon-cyan;
 }
@@ -267,7 +268,7 @@ window#waybar {
 
 #idle_inhibitor.deactivated:hover {
   color: @base;
-  background: @overlay2;
+  background: alpha(@overlay2, 0.60);
 }
 
 #memory {
@@ -278,7 +279,7 @@ window#waybar {
   padding-right: 10px;
   border-radius: 10px;
   transition: none;
-  background: @surface0;
+  background: alpha(@surface0, 0.60);
   color: @neon-purple;
   border-bottom: 3px;
   border-style: solid;
@@ -288,7 +289,7 @@ window#waybar {
 
 #memory:hover {
   color: @base;
-  background: @neon-purple;
+  background: alpha(@neon-purple, 0.85);
 
 }
 
@@ -300,7 +301,7 @@ window#waybar {
   padding-right: 10px;
   border-radius: 10px;
   transition: none;
-  background: @surface0;
+  background: alpha(@surface0, 0.60);
   color: @neon-green;
   border-bottom: 3px;
   border-style: solid;
@@ -310,7 +311,7 @@ window#waybar {
 
 #cpu:hover {
   color: @base;
-  background: @neon-green;
+  background: alpha(@neon-green, 0.85);
 
 }
 
@@ -323,7 +324,7 @@ window#waybar {
   border-radius: 10px;
   transition: none;
   color: @neon-yellow;
-  background: @surface0;
+  background: alpha(@surface0, 0.60);
   transition: 0.3s;
   border-bottom: 3px;
   border-style: solid;
@@ -331,20 +332,20 @@ window#waybar {
 }
 
 #custom-launcher:hover {
-  background: @neon-yellow;
+  background: alpha(@neon-yellow, 0.85);
   color: @crust;
 }
 
 #network.disconnected {
   color: @neon-red;
-  background: @surface0;
+  background: alpha(@surface0, 0.60);
   border-bottom: 3px;
   border-style: solid;
   border-color: @neon-red;
 }
 
 #network.disconnected:hover {
-  background: @neon-red;
+  background: alpha(@neon-red, 0.85);
   color: @base;
 }
 
@@ -354,7 +355,7 @@ window#waybar {
   margin-top: 10px;
   margin-left: 8px;
   padding-right: 4px;
-  background: @surface0;
+  background: alpha(@surface0, 0.60);
   border-bottom: 3px;
   border-style: solid;
   border-color: @neon-yellow;
@@ -374,7 +375,7 @@ window#waybar {
 
 #workspaces button.active {
   color: @crust;
-  background: @neon-yellow;
+  background: alpha(@neon-yellow, 0.85);
   border-radius: 8px;
   padding-left: 6px;
   padding-right: 6px;
@@ -401,7 +402,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: @surface0;
+  background: alpha(@surface0, 0.60);
   color: @overlay1;
   border-bottom: 3px;
   border-style: solid;
@@ -417,7 +418,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: @surface0;
+  background: alpha(@surface0, 0.60);
   color: @overlay1;
   border-bottom: 3px;
   border-style: solid;

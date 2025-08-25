@@ -214,6 +214,8 @@ spawn-at-startup "waybar"
 spawn-at-startup "clipse" "-listen"
 spawn-at-startup "bash" "-lc" "sleep 0.3; dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XDG_RUNTIME_DIR; systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XDG_RUNTIME_DIR; systemctl --user restart kitty-keepalive.service"
 spawn-at-startup "bash" "-lc" "exec /usr/bin/slack --enable-features=UseOzonePlatform,WebRTCPipeWireCapturer,WaylandWindowDecorations --ozone-platform=wayland"
+// Wallpaper via swaybg (per-output)
+spawn-at-startup "swaybg" "-m" "fill" "-o" "eDP-1" "-i" "/home/mastermind/.local/share/wallpapers/mastermind_front_1920x1200.png" "-o" "DP-2" "-i" "/home/mastermind/.local/share/wallpapers/mastermind_left_1200x1920.png"
 
 // ───────────────────────────────────────────────────────────────────────────────
 // WINDOW RULES (float/size/placement like your Hyprland rules)
@@ -225,12 +227,18 @@ window-rule {
 
 window-rule {
     match app-id=r#"(?i)^slack$"#
+    opacity 0.97
     open-on-workspace "3"
+    default-column-width {
+        proportion 1.0
+    }
 }
 
 // Ensure Google Chrome opens with full-width columns by default
 window-rule {
     match app-id=r#"(?i)^(google-chrome|com\.google\.Chrome)$"#
+    opacity 0.9
+    draw-border-with-background false
     default-column-width {
         proportion 1.0
     }
