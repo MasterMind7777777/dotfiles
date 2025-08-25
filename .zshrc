@@ -1,41 +1,56 @@
-# --- Instant Prompt Initialization (Powerlevel10k) ---
-# Enable Powerlevel10k instant prompt. Keep this at the top.
+# --- Kitty remote-control env (works with keepalive + Niri) ---
+# If we're running inside Kitty and RC var is missing, point it to the user socket.
+if [[ "$TERM" == "xterm-kitty" && -z "$KITTY_LISTEN_ON" ]]; then
+  export KITTY_LISTEN_ON="unix:${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/kitty.sock"
+fi
+# --- Instant Prompt (first, and keep quiet to avoid warnings) ---
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
-# --- Path and Environment Setup ---
-# Path to Oh My Zsh installation
+# --- Oh My Zsh core (no OMZ-managed plugins from system packages) ---
 export ZSH="$HOME/.oh-my-zsh"
+export ZSH_CUSTOM="$HOME/.oh-my-zsh/custom"
 
+# Don’t use OMZ’s theme loader; source the packaged theme directly
+ZSH_THEME=""
+if [[ -r /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme ]]; then
+  source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+elif [[ -r /usr/share/powerlevel10k/powerlevel10k.zsh-theme ]]; then
+  source /usr/share/powerlevel10k/powerlevel10k.zsh-theme
+fi
+[[ -r ~/.p10k.zsh ]] && source ~/.p10k.zsh
 
-setopt NO_BEEP
+# Load only OMZ’s built-in plugins here
+plugins=(git fzf docker docker-compose)
+source "$ZSH/oh-my-zsh.sh"
 
-# Add local binaries and custom paths
-# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
+# --- System plugins from pacman (source directly) ---
+# autosuggestions (before highlighting)
+[[ -r /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && \
+  source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
-# --- Theme Configuration ---
-# Set the theme for Oh My Zsh (Powerlevel10k)
-ZSH_THEME="powerlevel10k/powerlevel10k"
+# history substring search
+[[ -r /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh ]] && \
+  source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
 
-# To customize the prompt, run `p10k configure` or edit ~/.p10k.zsh
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# extra completions (extend fpath)
+if [[ -d /usr/share/zsh/plugins/zsh-completions ]]; then
+  fpath=(/usr/share/zsh/plugins/zsh-completions $fpath)
+fi
 
-# --- Plugin Configuration ---
-# Plugins loaded by Oh My Zsh. Add wisely as too many can slow startup.
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting fzf zsh-history-substring-search zsh-completions docker docker-compose)
+# syntax highlighting MUST be last
+[[ -r /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && \
+  source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-# Source Oh My Zsh
-source $ZSH/oh-my-zsh.sh
+# fzf keybindings/completions from package
+[[ -r /usr/share/fzf/key-bindings.zsh ]] && source /usr/share/fzf/key-bindings.zsh
+[[ -r /usr/share/fzf/completion.zsh   ]] && source /usr/share/fzf/completion.zsh
 
-# --- FZF Keybindings and Completions ---
-[ -f /usr/share/fzf/key-bindings.zsh ] && source /usr/share/fzf/key-bindings.zsh
-[ -f /usr/share/fzf/completion.zsh ] && source /usr/share/fzf/completion.zsh
-
-# --- Zsh Autocompletion Enhancements ---
-# Enable Zsh's autocompletion system
+# ensure completion system is initialized
 autoload -Uz compinit
-compinit
+compinit -u
 
 
 # Additional completion tweaks

@@ -1,0 +1,32 @@
+/*
+*
+* Cyberpunk 2077 Pixel Neon Palette
+* Inspired by: Cyberpunk 2077 poster
+*
+*/
+
+@define-color base   #0d0b1a;  /* deep night sky */
+@define-color mantle #151028;  /* darker purple-black */
+@define-color crust  #0a0913;  /* almost black */
+
+@define-color text     #e6e6f0; /* light neon white */
+@define-color subtext0 #a8a4c5; /* muted lavender */
+@define-color subtext1 #c2bfe0; /* soft light purple */
+
+@define-color surface0 #1e1a30; /* panel dark violet */
+@define-color surface1 #2a2344; /* building shade */
+@define-color surface2 #3a305c; /* slightly lighter purple */
+
+@define-color overlay0 #54497a; /* muted neon shadow */
+@define-color overlay1 #6b5da3; /* electric muted purple */
+@define-color overlay2 #8276c0; /* neon lavender fade */
+
+@define-color neon-yellow #f8f32b; /* Cyberpunk logo yellow */
+@define-color neon-pink   #ff2e88; /* vibrant pink signs */
+@define-color neon-magenta #d12cff; /* strong purple-magenta */
+@define-color neon-blue   #28e0f7; /* bright cyan glow */
+@define-color neon-cyan   #00f0ff; /* sharp cyan highlights */
+@define-color neon-purple #8c3cff; /* deep neon violet */
+@define-color neon-red    #ff3a3a; /* accent red signs */
+@define-color neon-orange #ff7b42; /* glowing orange signs */
+@define-color neon-green  #3effb5; /* rare neon green accent */
