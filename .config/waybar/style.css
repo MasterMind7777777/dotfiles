@@ -1,3 +1,5 @@
+@import "cyberpank.css";
+
 * {
   border: none;
   border-radius: 10px;
@@ -19,17 +21,17 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: #292c3c;
-  color: #bd93f9;
+  background: @surface0;
+  color: @neon-magenta;
   border-bottom: 3px;
   border-style: solid;
-  border-color: #bd93f9;
+  border-color: @neon-magenta;
   transition: 0.3s;
 }
 
 #window:hover, #niri-window:hover {
-  color: #292c3c;
-  background: #bd93f9;
+  color: @base;
+  background: @neon-magenta;
 }
 
 #network {
@@ -40,17 +42,17 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: #292c3c;
-  color: #bd93f9;
+  background: @surface0;
+  color: @neon-cyan;
   border-bottom: 3px;
   border-style: solid;
-  border-color: #bd93f9;
+  border-color: @neon-cyan;
   transition: 0.3s;
 }
 
 #network:hover {
-  color: #292c3c;
-  background: #bd93f9;
+  color: @base;
+  background: @neon-cyan;
 }
 
 #cava {
@@ -61,17 +63,17 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: #292c3c;
-  color: #bd93f9;
+  background: @surface0;
+  color: @neon-green;
   border-bottom: 3px;
   border-style: solid;
-  border-color: #bd93f9;
+  border-color: @neon-green;
   transition: 0.3s;
 }
 
 #cava:hover {
-  color: #292c3c;
-  background: #bd93f9;
+  color: @base;
+  background: @neon-green;
 }
 
 #battery {
@@ -82,22 +84,22 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: #292c3c;
-  color: #bd93f9;
+  background: @surface0;
+  color: @neon-orange;
   border-bottom: 3px;
   border-style: solid;
-  border-color: #bd93f9;
+  border-color: @neon-orange;
   transition: 0.3s;
 }
 
 #battery:hover {
-  color: #292c3c;
-  background: #bd93f9;
+  color: @base;
+  background: @neon-orange;
 }
 
 #backlight:hover {
-  color: #292c3c;
-  background: #bd93f9;
+  color: @base;
+  background: @neon-purple;
 }
 
 #backlight {
@@ -108,11 +110,11 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: #292c3c;
-  color: #bd93f9;
+  background: @surface0;
+  color: @neon-purple;
   border-bottom: 3px;
   border-style: solid;
-  border-color: #bd93f9;
+  border-color: @neon-purple;
   transition: 0.3s;
 }
 
@@ -124,17 +126,17 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: #292c3c;
-  color: #bd93f9;
+  background: @surface0;
+  color: @neon-pink;
   border-bottom: 3px;
   border-style: solid;
-  border-color: #bd93f9;
+  border-color: @neon-pink;
   transition: 0.3s;
 }
 
 #language:hover {
-  color: #292c3c;
-  background: #bd93f9;
+  color: @base;
+  background: @neon-pink;
 }
 
 #pulseaudio {
@@ -145,32 +147,32 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: #292c3c;
-  color: #bd93f9;
+  background: @surface0;
+  color: @neon-blue;
   padding: 8px;
   border-bottom: 3px;
   border-style: solid;
-  border-color: #bd93f9;
+  border-color: @neon-blue;
   transition: 0.3s;
 }
 
 #pulseaudio:hover {
-  background: #bd93f9;
-  color: #292c3c;
+  background: @neon-blue;
+  color: @base;
 }
 
 #pulseaudio.muted {
-  color: #f38ba8;
-  background: #292c3c;
+  color: @neon-red;
+  background: @surface0;
   border-bottom: 3px;
   border-style: solid;
-  border-color: #f38ba8;
+  border-color: @neon-red;
   transition: 0.3s;
 }
 
 #pulseaudio.muted:hover {
-  background: #f38ba8;
-  color: #292c3c;
+  background: @neon-red;
+  color: @base;
 
 }
 
@@ -182,17 +184,17 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: #292c3c;
-  color: #bd93f9;
+  background: @surface0;
+  color: @neon-yellow;
   border-bottom: 3px;
   border-style: solid;
-  border-color: #bd93f9;
+  border-color: @neon-yellow;
   transition: 0.3s;
 }
 
 #clock:hover {
-  color: #292c3c;
-  background: #bd93f9;
+  color: @base;
+  background: @neon-yellow;
 }
 
 #disk {
@@ -203,17 +205,17 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: #292c3c;
-  color: #bd93f9;
+  background: @surface0;
+  color: @neon-purple;
   border-bottom: 3px;
   border-style: solid;
-  border-color: #bd93f9;
+  border-color: @neon-purple;
   transition: 0.3s;
 }
 
 #disk:hover {
-  color: #292c3c;
-  background: #bd93f9;
+  color: @base;
+  background: @neon-purple;
 }
 
 #privacy {
@@ -224,11 +226,11 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: #292c3c;
-  color: #bd93f9;
+  background: @surface0;
+  color: @overlay0;
   border-bottom: 3px;
   border-style: solid;
-  border-color: #bd93f9;
+  border-color: @overlay0;
   transition: 0.3s;
 }
 
@@ -240,32 +242,32 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: #292c3c;
-  color: #bd93f9;
+  background: @surface0;
+  color: @overlay2;
   border-bottom: 3px;
   border-style: solid;
-  border-color: #bd93f9;
+  border-color: @overlay2;
   transition: 0.3s;
 }
 
 #idle_inhibitor.activated {
-  color: #89b4fa;
-  border-color: #89b4fa;
+  color: @neon-cyan;
+  border-color: @neon-cyan;
 }
 
 #idle_inhibitor.activated:hover {
-  background: #89b4fa;
-  color: #292c3c;
-  border-color: #89b4fa;
+  background: @neon-cyan;
+  color: @base;
+  border-color: @neon-cyan;
 }
 
 #idle_inhibitor.deactivated {
-  color: #bd93f9
+  color: @overlay2
 }
 
 #idle_inhibitor.deactivated:hover {
-  color: #292c3c;
-  background: #bd93f9;
+  color: @base;
+  background: @overlay2;
 }
 
 #memory {
@@ -276,17 +278,17 @@ window#waybar {
   padding-right: 10px;
   border-radius: 10px;
   transition: none;
-  background: #292c3c;
-  color: #bd93f9;
+  background: @surface0;
+  color: @neon-purple;
   border-bottom: 3px;
   border-style: solid;
-  border-color: #bd93f9;
+  border-color: @neon-purple;
   transition: 0.3s;
 }
 
 #memory:hover {
-  color: #292c3c;
-  background: #bd93f9;
+  color: @base;
+  background: @neon-purple;
 
 }
 
@@ -298,17 +300,17 @@ window#waybar {
   padding-right: 10px;
   border-radius: 10px;
   transition: none;
-  background: #292c3c;
-  color: #bd93f9;
+  background: @surface0;
+  color: @neon-green;
   border-bottom: 3px;
   border-style: solid;
-  border-color: #bd93f9;
+  border-color: @neon-green;
   transition: 0.3s;
 }
 
 #cpu:hover {
-  color: #292c3c;
-  background: #bd93f9;
+  color: @base;
+  background: @neon-green;
 
 }
 
@@ -320,30 +322,30 @@ window#waybar {
   padding-right: 5px;
   border-radius: 10px;
   transition: none;
-  color: #bd93f9;
-  background: #292c3c;
+  color: @neon-yellow;
+  background: @surface0;
   transition: 0.3s;
   border-bottom: 3px;
   border-style: solid;
-  border-color: #bd93f9;
+  border-color: @neon-yellow;
 }
 
 #custom-launcher:hover {
-  background: #bd93f9;
-  color: #292c3c;
+  background: @neon-yellow;
+  color: @crust;
 }
 
 #network.disconnected {
-  color: #f38ba8;
-  background: #292c3c;
+  color: @neon-red;
+  background: @surface0;
   border-bottom: 3px;
   border-style: solid;
-  border-color: #f38ba8;
+  border-color: @neon-red;
 }
 
 #network.disconnected:hover {
-  background: #f38ba8;
-  color: #292c3c;
+  background: @neon-red;
+  color: @base;
 }
 
 /* removed custom-lock module styles */
@@ -352,26 +354,30 @@ window#waybar {
   margin-top: 10px;
   margin-left: 8px;
   padding-right: 4px;
-  background: #292c3c;
+  background: @surface0;
   border-bottom: 3px;
   border-style: solid;
-  border-color: #bd93f9;
-  color: #bd93f9;
+  border-color: @neon-yellow;
+  color: @subtext1;
   transition: 0.3s;
 }
 
 #workspaces button {
-  color: #bd93f9;
+  color: @subtext1;
   transition: 0.3s;
 }
 
 #workspaces button:hover {
   background: transparent;
-  color: transparent;
+  color: @text;
 }
 
 #workspaces button.active {
-  color: #b4befe;
+  color: @crust;
+  background: @neon-yellow;
+  border-radius: 8px;
+  padding-left: 6px;
+  padding-right: 6px;
   transition: 0.3s;
 }
 
@@ -395,11 +401,11 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: #292c3c;
-  color: #bd93f9;
+  background: @surface0;
+  color: @overlay1;
   border-bottom: 3px;
   border-style: solid;
-  border-color: #bd93f9;
+  border-color: @overlay1;
   transition: 0.3s;
 }
 
@@ -411,10 +417,10 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: #292c3c;
-  color: #bd93f9;
+  background: @surface0;
+  color: @overlay1;
   border-bottom: 3px;
   border-style: solid;
-  border-color: #bd93f9;
+  border-color: @overlay1;
   transition: 0.3s;
 }

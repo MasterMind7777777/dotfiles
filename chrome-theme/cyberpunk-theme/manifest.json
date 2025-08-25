@@ -1,0 +1,82 @@
+{
+  "manifest_version": 3,
+  "version": "1.0",
+  "name": "Cyberpunk 2077 Neon",
+  "description": "Dark violet base with neon accents from the Cyberpunk 2077 Pixel Neon palette.",
+  "theme": {
+    "images": {
+      "theme_frame": "images/theme_frame.png",
+      "theme_frame_inactive": "images/theme_frame_inactive.png",
+      "theme_frame_incognito": "images/theme_frame_incognito.png",
+      "theme_frame_incognito_inactive": "images/theme_frame_incognito_inactive.png",
+      "theme_toolbar": "images/theme_toolbar.png",
+      "theme_tab_background": "images/theme_tab_background.png",
+      "theme_tab_background_inactive": "images/theme_tab_background_inactive.png",
+      "theme_tab_background_incognito": "images/theme_tab_background_incognito.png",
+      "theme_tab_background_incognito_inactive": "images/theme_tab_background_incognito_inactive.png",
+      "theme_frame_overlay": "images/theme_frame_overlay.png",
+      "theme_frame_overlay_inactive": "images/theme_frame_overlay_inactive.png",
+      "theme_button_background": "images/theme_button_background.png",
+      "theme_window_control_background": "images/theme_window_control_background.png",
+      "theme_ntp_background": "images/ntp_background.png",
+      "theme_ntp_attribution": "images/attribution.png"
+    },
+    "colors": {
+      // Frames
+      "frame": [13, 11, 26],                    // base              #0d0b1a
+      "frame_inactive": [10, 9, 19],            // crust             #0a0913
+      "frame_incognito": [21, 16, 40],          // mantle            #151028
+      "frame_incognito_inactive": [10, 9, 19],  // crust             #0a0913
+
+      // Tabs (backgrounds/text)
+      "background_tab": [42, 35, 68],                 // surface1         #2a2344
+      "background_tab_inactive": [30, 26, 48],        // surface0         #1e1a30
+      "background_tab_incognito": [58, 48, 92],       // surface2         #3a305c
+      "background_tab_incognito_inactive": [42, 35, 68], // surface1      #2a2344
+      "tab_text": [0, 240, 255],                      // neon-cyan        #00f0ff (active tab text)
+      "tab_background_text": [130, 118, 192],         // overlay2         #8276c0 (background tab text)
+      "tab_background_text_inactive": [230, 230, 240], // text            #e6e6f0 (higher contrast when window inactive)
+      "tab_background_text_incognito": [130, 118, 192], // overlay2       #8276c0
+      "tab_background_text_incognito_inactive": [230, 230, 240], // text   #e6e6f0 (higher contrast when window inactive)
+
+      // Toolbar & icons
+      "toolbar": [21, 16, 40],                // mantle            #151028 (selected tab bg)
+      "toolbar_text": [230, 230, 240],        // text              #e6e6f0
+      "toolbar_button_icon": [130, 118, 192], // overlay2          #8276c0
+      "button_background": [248, 243, 43],    // neon-yellow       #f8f32b
+
+      // Omnibox
+      "omnibox_background": [30, 26, 48],     // surface0          #1e1a30
+      "omnibox_text": [230, 230, 240],        // text              #e6e6f0
+
+      // NTP (New Tab Page)
+      "ntp_background": [13, 11, 26],         // base              #0d0b1a
+      "ntp_header": [21, 16, 40],             // mantle            #151028
+      "ntp_text": [230, 230, 240],            // text              #e6e6f0
+      "ntp_link": [40, 224, 247],             // neon-blue         #28e0f7
+
+      // Bookmarks
+      "bookmark_text": [230, 230, 240],       // text              #e6e6f0
+
+      // Legacy/extra (kept, still from palette)
+      "ntp_section": [42, 35, 68],            // surface1          #2a2344
+
+      // Tab group chip overrides (subject to change in Chromium)
+      "grey_override":   [130, 118, 192],     // overlay2          #8276c0
+      "blue_override":   [40, 224, 247],      // neon-blue         #28e0f7
+      "red_override":    [255, 58, 58],       // neon-red          #ff3a3a
+      "yellow_override": [248, 243, 43],      // neon-yellow       #f8f32b
+      "green_override":  [62, 255, 181],      // neon-green        #3effb5
+      "pink_override":   [255, 46, 136],      // neon-pink         #ff2e88
+      "purple_override": [140, 60, 255],      // neon-purple       #8c3cff
+      "cyan_override":   [0, 240, 255],       // neon-cyan         #00f0ff
+      "orange_override": [255, 123, 66]       // neon-orange       #ff7b42
+    },
+    // Remove non-palette tints to keep pure CSS-book colors
+    "properties": {
+      "ntp_background_alignment": "center",
+      "ntp_background_repeat": "no-repeat",
+      "ntp_logo_alternate": 1
+    }
+  }
+}

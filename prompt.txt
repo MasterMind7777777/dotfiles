@@ -1,0 +1,57 @@
+Cyberpunk Chrome Theme — AI Image Generation Prompt (Single Output)
+
+Scope
+- Generate exactly one New Tab Page wallpaper via AI.
+- All other strip assets (frame/toolbar/tab overlays) are programmatic and NOT part of this request.
+
+Deliverable (exactly one file)
+- One PNG, size exactly 1792×1024 (Wide).
+- sRGB color space. No watermarks, no embedded text, no logos.
+- Produce one and only one final image (no variants, no alternates).
+
+Palette (strict — use only these hex values)
+- Backgrounds: base #0d0b1a, mantle #151028, crust #0a0913
+- Surfaces: surface0 #1e1a30, surface1 #2a2344, surface2 #3a305c
+- Overlays: overlay0 #54497a, overlay1 #6b5da3, overlay2 #8276c0
+- Text neutrals: text #e6e6f0, subtext0 #a8a4c5, subtext1 #c2bfe0
+- Neon accents: neon-cyan #00f0ff, neon-magenta #d12cff, neon-blue #28e0f7,
+  neon-yellow #f8f32b, neon-red #ff3a3a, neon-orange #ff7b42, neon-pink #ff2e88,
+  neon-purple #8c3cff, neon-green #3effb5
+
+Global Style Targets
+- Mood: Cyberpunk night city/abstract neon ambiance, moody and futuristic.
+- Contrast: Central composition must remain dark enough for light text overlays.
+- Treatment: Soft neon bloom and subtle atmospheric haze; avoid harsh banding.
+- Clean UI backdrop: no text, no logos, no UI chrome, no people/faces.
+
+Composition & Safe Areas
+- Keep the middle 60% (both axes) relatively dark and low-detail for readability.
+- Avoid bright horizontal/vertical bars within 6% of any edge to prevent visual seams.
+- Distribute neon accents toward the sides/corners; keep the center subdued.
+- Prefer diagonal flow lines and depth; avoid cluttered micro-details in the center.
+
+Technical Requirements
+- Output: PNG, sRGB color space, no embedded text/watermarks.
+- Final resolution must be exactly 1792×1024.
+- Palette adherence: restrict hues to the palette list only (no off-palette colors).
+- Grain: add very fine film grain 1–2% to mitigate banding; no obvious noise patterns.
+- Dynamic range: avoid pure black; lowest luminance should sit around #0a0913–#0d0b1a.
+
+Negative Guidance (avoid)
+- No typography, no branding, no watermarks.
+- No photoreal human subjects; silhouettes are acceptable only if abstracted.
+- No hard-edged neon lines along top/bottom edges; no centered bright flares.
+- No warm daylight tones; keep strictly to the provided palette.
+
+Prompt — Wide 1792×1024 (the only output)
+“A cyberpunk night cityscape abstracted into geometric neon reflections and soft haze, rendered as a clean UI wallpaper. Deep violet night base with subtle gradients (base #0d0b1a, mantle #151028, surface1 #2a2344), accented by limited neon highlights (neon-cyan #00f0ff, neon-magenta #d12cff, neon-blue #28e0f7, neon-yellow #f8f32b sparingly). Central region remains dark and low-contrast for readability, with interest pushed toward edges and corners. Gentle bloom and atmospheric perspective, slight 1–2% film grain to prevent banding. No text, no logos, no people. Avoid bright bars near edges; avoid center hotspots. Color palette strictly limited to the provided hex values.”
+
+Strict Output Constraint
+- Generate exactly one image, in exactly one size: 1792×1024. Do not generate multiple variants or orientations.
+
+Review Checklist (acceptance criteria)
+- Palette: No colors outside the specified hex values.
+- Readability: Center region remains sufficiently dark and simple.
+- Edges: No bright lines/flares hugging edges; safe margins respected.
+- Banding: Fine grain present; gradients look smooth.
+- Style: Cyberpunk mood achieved without busy center or literal signage.
