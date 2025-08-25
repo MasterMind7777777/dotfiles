@@ -191,6 +191,9 @@ window#waybar {
   border-style: solid;
   border-color: @neon-yellow;
   transition: 0.3s;
+  /* Dedicated clock font: clean UI sans, bold for readability */
+  font-family: "IBM Plex Sans", "Inter", "Manrope", "JetBrainsMono Nerd Font", "Symbols Nerd Font", sans-serif;
+  font-weight: 700;
 }
 
 #clock:hover {
@@ -354,6 +357,7 @@ window#waybar {
 #workspaces {
   margin-top: 10px;
   margin-left: 8px;
+  padding-left: 4px;
   padding-right: 4px;
   background: alpha(@surface0, 0.60);
   border-bottom: 3px;
@@ -366,6 +370,11 @@ window#waybar {
 #workspaces button {
   color: @subtext1;
   transition: 0.3s;
+  /* Separate each workspace number visually */
+  margin: 0 4px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  min-height: 28px; /* align with other chips */
 }
 
 #workspaces button:hover {
@@ -373,24 +382,42 @@ window#waybar {
   color: @text;
 }
 
-#workspaces button.active {
-  color: @crust;
-  background: alpha(@neon-yellow, 0.85);
-  border-radius: 8px;
-  padding-left: 6px;
-  padding-right: 6px;
-  transition: 0.3s;
+/* Active workspace styles consolidated below */
+
+/* Workspace states: empty vs non-empty */
+#workspaces button.empty {
+  background: transparent;
+  color: transparent; /* keep button but hide the number */
+  border: 0;
 }
 
-/* Hide empty workspaces so only populated ones appear (GTK CSS lacks 'display') */
+#workspaces button:not(.empty) {
+  color: @text;
+  background: alpha(@surface1, 0.35);
+}
+
+/* Ensure empty workspace label is fully invisible, and no hover effect */
 #workspaces button.empty {
-  min-width: 0px;
-  padding: 0px;
-  margin: 0px;
-  border: 0px;
-  background: transparent;
   color: transparent;
-  font-size: 0px;
+  background: transparent;
+  box-shadow: none;
+  /* Collapse visual width for empty slots */
+  min-width: 6px;
+  padding: 0 2px;
+  margin: 0 2px;
+  /* Make the number effectively invisible without breaking layout */
+  font-size: 1px;
+}
+#workspaces button.empty:hover { background: transparent; }
+#workspaces button.empty label { color: transparent; opacity: 0; font-size: 1px; }
+
+/* Active workspace: different font, bolder and slightly larger */
+#workspaces button.active {
+  font-family: "Manrope", "Inter", "IBM Plex Sans", "JetBrainsMono Nerd Font", sans-serif;
+  font-weight: 800;
+  font-size: 110%;
+  color: @base;
+  background: alpha(@neon-yellow, 0.85);
 }
 
 #tray {
