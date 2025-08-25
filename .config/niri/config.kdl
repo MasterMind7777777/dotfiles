@@ -78,19 +78,23 @@ layout {
     }
 
     focus-ring {
-        off
         width 4
-        active-color "#7fc8ff"
-        inactive-color "#505050"
+        // Colors aligned with ~/.config/waybar/cyberpank.css
+        // active: neon-cyan, inactive: overlay0
+        active-gradient from="#00f0ff" to="#d12cff" angle=135 relative-to="workspace-view"
+        // inactive: overlay1 -> overlay2
+        inactive-gradient from="#8276c0" to="#6b5da3" angle=135 relative-to="workspace-view" in="oklch shorter hue"
     }
 
     // border is optional; focus-ring already gives you a highlight.
     border {
-      
-    active-gradient from="#8caaee" to="#f4b8e4" angle=135 relative-to="workspace-view"
-    inactive-gradient from="#8e7ab5" to="#756ab6" angle=135 relative-to="workspace-view" in="oklch shorter hue"
-    width 3
-  }
+      // Cyberpunk neon accents (from waybar/cyberpank.css)
+      // active: neon-magenta -> neon-cyan
+      active-gradient from="#d12cff" to="#00f0ff" angle=135 relative-to="workspace-view"
+      // inactive: overlay1 -> overlay2
+      inactive-gradient from="#6b5da3" to="#8276c0" angle=135 relative-to="workspace-view" in="oklch shorter hue"
+      width 3
+    }
 
     shadow {
         on
