@@ -128,7 +128,7 @@ export PATH="$HOME/.emacs.d/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 . "$HOME/.cargo/env"
 
-export XDG_CURRENT_DESKTOP=Hyprland
+export XDG_CURRENT_DESKTOP=niri
 export XDG_SESSION_TYPE=wayland
 export XKB_DEFAULT_LAYOUT="us,ru"
 export GTK_THEME=gruvbox-dark-gtk
