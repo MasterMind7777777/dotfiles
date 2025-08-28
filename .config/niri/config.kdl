@@ -38,14 +38,14 @@ environment {
     GTK_THEME "gruvbox-dark-gtk"
     QT_QPA_PLATFORMTHEME "qt5ct"
     QT_STYLE_OVERRIDE "kvantum"
-
-    XCURSOR_THEME "phinger-cursors-gruvbox-material"
-    XCURSOR_SIZE "14"
+    DISPLAY ":0"
+    __GLX_VENDOR_LIBRARY_NAME "nvidia"  // helps GLX pick NVIDIA on X11 apps
+    WLR_NO_HARDWARE_CURSORS "1"        // optional: fixes rare cursor glitches on NVIDIA
 }
 
 cursor {
-    xcursor-theme "phinger-cursors-gruvbox-material"
-    xcursor-size 14
+    xcursor-theme "phinger-cursors-dark"
+    xcursor-size 32
 
     // Popular polish:
     hide-when-typing
@@ -213,6 +213,8 @@ workspace "ndrop"
 spawn-at-startup "waybar"
 spawn-at-startup "clipse" "-listen"
 spawn-at-startup "bash" "-lc" "sleep 0.3; dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XDG_RUNTIME_DIR; systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XDG_RUNTIME_DIR; systemctl --user restart kitty-keepalive.service"
+spawn-at-startup "xwayland-satellite"
+
 spawn-at-startup "bash" "-lc" "exec /usr/bin/slack --enable-features=UseOzonePlatform,WebRTCPipeWireCapturer,WaylandWindowDecorations --ozone-platform=wayland"
 // Wallpaper via swaybg (per-output)
 spawn-at-startup "swaybg" "-m" "fill" "-o" "eDP-1" "-i" "/home/mastermind/.local/share/wallpapers/mastermind_front_1920x1200.png" "-o" "DP-2" "-i" "/home/mastermind/.local/share/wallpapers/mastermind_left_1200x1920.png"
