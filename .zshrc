@@ -100,6 +100,89 @@ gac() {
   git add . && git commit -m "$1"
 }
 
+
+rim-mod() {
+  if [[ $# -eq 0 ]]; then
+    echo "Usage: rim-mod <WorkshopModID | WorkshopURL> [more IDs/URLs...]"
+    return 1
+  fi
+
+  local appid=294100
+  local mods_dir="$HOME/Games/rimworld/drive_c/Program Files (x86)/RimWorld/Mods"
+
+  # Ensure SteamCMD exists
+  if ! command -v steamcmd >/dev/null 2>&1; then
+    echo "steamcmd not found. Install it: yay -S steamcmd"
+    return 1
+  fi
+
+  for input in "$@"; do
+    echo "──────────────────────────────────────────────"
+    echo "Processing: $input"
+
+    # Extract ModID if URL was passed
+    local modid="$input"
+    if [[ "$input" == http* ]]; then
+      modid="${input##*id=}"
+      modid="${modid%%[^0-9]*}"
+    fi
+    if ! [[ "$modid" =~ ^[0-9]+$ ]]; then
+      echo "Could not parse a numeric ModID from: $input"
+      continue
+    fi
+
+    echo ">>> Downloading mod $modid via SteamCMD..."
+    steamcmd +login anonymous +workshop_download_item "$appid" "$modid" +quit
+
+    # Candidate workshop roots
+    local candidates=(
+      "$HOME/.steam/steamapps/workshop/content/$appid/$modid"
+      "$HOME/.steam/SteamApps/workshop/content/$appid/$modid"
+      "$HOME/.local/share/Steam/steamapps/workshop/content/$appid/$modid"
+    )
+
+    # Resolve first existing path
+    local src=""
+    for p in "${candidates[@]}"; do
+      if [[ -d "$p" ]]; then
+        src="$p"
+        break
+      fi
+    done
+
+    if [[ -z "$src" ]]; then
+      echo "!!! Downloaded path not found for $modid. Checked:"
+      printf ' - %s\n' "${candidates[@]}"
+      echo "Tip: run 'find ~/.steam ~/.local/share/Steam -type d -name $modid' to locate it."
+      continue
+    fi
+
+    # Read mod name from About.xml
+    local modname="mod_$modid"
+    local about="$src/About/About.xml"
+    if [[ -f "$about" ]]; then
+      local n
+      n=$(grep -oPm1 '(?<=<name>)[^<]+' "$about" 2>/dev/null | tr -d $'\r' | sed 's/[[:space:]]\+$//')
+      [[ -n "$n" ]] && modname="$n"
+    fi
+
+    local dest="$mods_dir/$modname"
+    echo ">>> Installing to: $dest"
+    mkdir -p "$mods_dir"
+    rm -rf "$dest"
+    rsync -a --delete "$src"/ "$dest"/
+
+    if [[ -d "$dest" ]]; then
+      echo "✅ Installed '$modname'."
+    else
+      echo "❌ Install failed for $modid"
+    fi
+  done
+
+  echo "──────────────────────────────────────────────"
+  echo "All done. Enable mods in RimWorld's mod menu."
+}
+
 # move to bin
 # newterm() {
 #   kitty --detach --working-directory "$(pwd)"
@@ -123,6 +206,7 @@ export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
+export PATH="$HOME/go/bin:$PATH"
 export PATH="/usr/bin:$PATH"
 export PATH="$HOME/.emacs.d/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
@@ -134,4 +218,3 @@ export XKB_DEFAULT_LAYOUT="us,ru"
 export GTK_THEME=gruvbox-dark-gtk
 export GTK_ICON_THEME=Colloid-Gruvbox
 export XCURSOR_THEME="Colloid-Gruvbox"
-
