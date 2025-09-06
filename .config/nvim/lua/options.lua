@@ -62,3 +62,16 @@ if original_process_request then
 end
 
 -- TEMPORARY FIXES UNTIL THE FOLLOWING PULL REQUESTS ARE MERGED:
+
+-- Use the smart wrapper (Option A)
+vim.g.rustaceanvim = {
+  server = {
+    cmd = { vim.fn.expand("~/.local/bin/rust-analyzer") },
+    default_settings = {
+      ["rust-analyzer"] = {
+        cargo = { allFeatures = true },
+        check = { command = "clippy" },
+      },
+    },
+  },
+}
