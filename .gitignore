@@ -5,3 +5,4 @@ bash/notes/venv/
 # Codex CLI runtime data (ignore all except config)
 .codex/*
 !.codex/config.toml
+!.codex/AGENTS.md
