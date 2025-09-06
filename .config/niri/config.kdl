@@ -293,6 +293,12 @@ window-rule {
     open-maximized false
 }
 
+// Make RimWorld open fullscreen (match title contains, case-insensitive)
+window-rule {
+    match title=r#"(?i)rimworld"#
+    open-fullscreen true
+}
+
 // ───────────────────────────────────────────────────────────────────────────────
 // KEY BINDS (mirrors Hypr muscle‑memory)
 // ───────────────────────────────────────────────────────────────────────────────

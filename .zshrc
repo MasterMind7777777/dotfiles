@@ -203,14 +203,10 @@ rim-mod() {
 # bun
 export BUN_INSTALL="$HOME/.bun"
 
-export PATH="$BUN_INSTALL/bin:$PATH"
-export PATH="$HOME/bin:$PATH"
-export PATH="$HOME/.cargo/bin:$PATH"
-export PATH="$HOME/go/bin:$PATH"
-export PATH="/usr/bin:$PATH"
-export PATH="$HOME/.emacs.d/bin:$PATH"
-export PATH="$HOME/.cargo/bin:$PATH"
-. "$HOME/.cargo/env"
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/bin:$HOME/.local/bin:$HOME/bin:$BUN_INSTALL/bin:$HOME/go/bin:$HOME/.emacs.d/bin:$HOME/.cargo/bin"
+# optional: if you still source cargo's env, do it *before* re-asserting /usr/bin
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+export PATH="/usr/bin:$PATH"   # bump /usr/bin back to the front in case cargo/env changed it
 
 export XDG_CURRENT_DESKTOP=niri
 export XDG_SESSION_TYPE=wayland

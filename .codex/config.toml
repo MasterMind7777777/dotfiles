@@ -1,0 +1,9 @@
+# ~/.codex/config.toml
+
+# Optional: Set default model or other global settings here
+# model = "gpt-5"
+# model_provider = "azure"
+
+[mcp_servers.playwright]
+command = "npx"
+args = ["-y", "@playwright/mcp@latest"]

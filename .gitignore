@@ -2,3 +2,6 @@ bash/python/i3ipc_project/i3ipc_venv/
 bash/i3/venv/
 bash/notes/venv/
 
+# Codex CLI runtime data (ignore all except config)
+.codex/*
+!.codex/config.toml
