@@ -452,3 +452,32 @@ window#waybar {
   border-color: @overlay1;
   transition: 0.3s;
 }
+
+/* SwayNC custom Waybar module */
+#custom-swaync {
+  margin-top: 10px;
+  margin-left: 8px;
+  margin-right: 17px; /* match leftmost launcher margin */
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-bottom: 0px;
+  border-radius: 10px;
+  transition: none;
+  background: alpha(@surface0, 0.60);
+  color: @neon-pink;
+  border-bottom: 3px;
+  border-style: solid;
+  border-color: @neon-pink;
+  transition: 0.3s;
+}
+
+#custom-swaync:hover {
+  color: @base;
+  background: alpha(@neon-pink, 0.85);
+}
+
+/* When DND is active, dim and switch to overlay color */
+#custom-swaync.dnd {
+  color: @overlay1;
+  border-color: @overlay1;
+}

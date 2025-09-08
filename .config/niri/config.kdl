@@ -211,11 +211,16 @@ workspace "ndrop"
 // AUTOSTART (Hyprland exec-once equivalents)
 // ───────────────────────────────────────────────────────────────────────────────
 spawn-at-startup "waybar"
+// Hide tray at startup; shown when opening SwayNC via our Waybar button
 spawn-at-startup "clipse" "-listen"
 spawn-at-startup "bash" "-lc" "sleep 0.3; dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XDG_RUNTIME_DIR; systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XDG_RUNTIME_DIR; systemctl --user restart kitty-keepalive.service"
 spawn-at-startup "xwayland-satellite"
 
-spawn-at-startup "bash" "-lc" "exec /usr/bin/slack --enable-features=UseOzonePlatform,WebRTCPipeWireCapturer,WaylandWindowDecorations --ozone-platform=wayland"
+// Notifications (swaync)
+spawn-at-startup "swaync"
+
+// Launch Slack with explicit Wayland/Electron flags and portal hint
+spawn-at-startup "bash" "-lc" "pkill -x slack || true; exec env ELECTRON_OZONE_PLATFORM_HINT=wayland OZONE_PLATFORM=wayland GTK_USE_PORTAL=1 /usr/bin/slack --enable-features=UseOzonePlatform,WaylandWindowDecorations,WebRTCPipeWireCapturer --ozone-platform=wayland"
 // Wallpaper via swaybg (per-output)
 spawn-at-startup "swaybg" "-m" "fill" "-o" "eDP-1" "-i" "/home/mastermind/.local/share/wallpapers/mastermind_front_1920x1200.png" "-o" "DP-2" "-i" "/home/mastermind/.local/share/wallpapers/mastermind_left_1200x1920.png"
 

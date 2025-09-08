@@ -7,14 +7,10 @@
     // Choose the order of the modules
     "modules-left": ["custom/launcher", "niri/workspaces"],
     "modules-center": ["clock"],
-    "modules-right": ["niri/window", "pulseaudio", "network", "backlight", "battery", "niri/language", "tray"],
+    "modules-right": ["niri/window", "pulseaudio", "network", "backlight", "battery", "niri/language", "custom/swaync"],
     "niri/workspaces": {
         "format": "{name}",
         "all-outputs": false
-    },
-    "tray": {
-        "icon-size": 21,
-        "spacing": 10
     },
     "custom/launcher":{
         "format": " ",
@@ -75,6 +71,13 @@
         "on-click": "wlogout &",
         "format": "⏻ "
     },
+    "custom/swaync": {
+        "return-type": "json",
+        "exec": "swaync-client -swb",
+        "on-click": "swaync-client -t -sw",
+        "on-click-right": "swaync-client -d -sw",
+        "tooltip": false
+    },
     "niri/language": {
         "format": "  {short}",
     },
@@ -98,19 +101,19 @@
     "position": "top",
     "modules-left": ["custom/launcher", "niri/workspaces"],
     "modules-center": ["clock"],
-    "modules-right": ["niri/window", "pulseaudio", "network", "backlight", "battery", "niri/language", "tray"],
+    "modules-right": ["niri/window", "pulseaudio", "network", "backlight", "battery", "niri/language", "custom/swaync"],
     "niri/workspaces": {
         "format": "{name}",
         "all-outputs": false
     },
     "niri/window": { "format": "{title}", "max-length": 80 },
-    "tray": { "icon-size": 21, "spacing": 10 },
     "custom/launcher": { "format": " ", "on-click": "fuzzel --config ~/.config/fuzzel/launcher.ini || pkill fuzzel", "on-click-right": "pkill fuzzel", "tooltip": false },
     "custom/music": { "format": "  {}", "escape": true, "interval": 5, "tooltip": false, "exec": "playerctl metadata --format='{{ title }}'", "on-click": "playerctl play-pause", "max-length": 50 },
     "clock": { "timezone": "America/Argentina/Buenos_Aires", "tooltip": false, "format": " {:%A %d %B (%m) %Y %H:%M:%S}", "on-click": "TZ=America/Argentina/Buenos_Aires date '+%F %T' | wl-copy" },
     "backlight": { "device": "amdgpu_bl1", "format": "{icon} {percent}%", "format-alt": "{icon}", "tooltip": false, "format-icons": ["", "", "", "", "", "", "", "", ""] },
     "battery": { "interval": 30, "states": { "warning": 20, "critical": 10 }, "format": "{icon} {capacity}%", "format-charging": "󰂄 {capacity}%", "format-plugged": " {capacity}%", "format-alt": "{icon}", "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"] },
     "pulseaudio": { "format": "{icon} {volume}%", "format-muted": " ", "format-icons": { "default": ["", "", ""] }, "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle", "on-click-right": "pavucontrol" },
+    "custom/swaync": { "return-type": "json", "exec": "swaync-client -swb", "on-click": "swaync-client -t -sw", "on-click-right": "swaync-client -d -sw", "tooltip": false },
     "custom/power": { "tooltip": false, "on-click": "wlogout &", "format": "⏻ " },
     "niri/language": { "format": "  {short}" },
     "network": { "interface": "wlp0s20f3", "format": "{ifname}", "format-disconnected": "", "format-wifi": " ", "format-alt": "  {essid}", "tooltip-format": "{signalStrength}%", "tooltip-format-wifi": "{essid} {signalStrength}%", "tooltip-format-disconnected": "No Connection" }

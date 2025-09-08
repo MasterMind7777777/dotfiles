@@ -1,0 +1,187 @@
+/* SwayNC themed with Waybar cyberpunk palette */
+@import url("/home/mastermind/.config/waybar/cyberpank.css");
+
+/* Override SwayNC CSS variables to eliminate gray defaults */
+:root {
+  /* Control Center background can be any CSS background value */
+  --cc-bg: linear-gradient(
+    135deg,
+    alpha(@surface1, 0.94) 0%,
+    alpha(@surface2, 0.94) 100%
+  );
+
+  /* Notification card colors (expects r,g,b components for --noti-bg) */
+  /* @surface0 #1e1a30 = rgb(30,26,48); @surface1 #2a2344 = rgb(42,35,68); */
+  --noti-bg: 30, 26, 48; /* surface0 */
+  --noti-bg-alpha: 0.94; /* slightly more transparent */
+  --noti-bg-darker: rgb(21, 16, 40); /* deeper mantle-ish */
+  --noti-bg-hover: rgb(42, 35, 68); /* surface1 */
+  --noti-bg-focus: rgba(42, 35, 68, 0.96);
+
+  /* Borders and text */
+  --noti-border-color: alpha(@overlay1, 0.9);
+  --text-color: @text;
+  --text-color-disabled: @overlay2;
+
+  /* Radius/shadow to match Waybar chips */
+  --border-radius: 10px;
+  --notification-shadow: 0 10px 30px alpha(@crust, 0.55);
+}
+/* --- SwayNC cyberpunk refinements --------------------------------------- */
+
+/* 1) Actually use your custom background var */
+.control-center {
+  background: var(--cc-bg);
+}
+
+/* 2) Toast window: keep transparent wrapper, style the cards inside */
+.floating-notifications.background {
+  background: transparent;
+}
+
+/* 3) Shared card container (toasts + control-center list) */
+.floating-notifications.background .notification-row .notification-background,
+.control-center .notification-row .notification-background {
+  margin: 8px;
+  padding: 0; /* background wraps the .notification */
+  border-radius: var(--border-radius);
+  box-shadow:
+    0 0 0 2px alpha(@neon-magenta, 0.55) inset,
+    0 0 12px alpha(@neon-cyan, 0.25),
+    0 8px 22px alpha(@crust, 0.55);
+}
+
+/* 4) Actual notification body */
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .notification,
+.control-center .notification-row .notification-background .notification {
+  /* Use your noti-bg vars on GTK4, gracefully fall back to @surface1 */
+  background: rgba(var(--noti-bg, 30, 26, 48), var(--noti-bg-alpha, 0.94));
+  border: 2px solid transparent;
+  border-radius: var(--border-radius);
+  padding: 10px 12px;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+.floating-notifications.background
+  .notification-row:hover
+  .notification-background
+  .notification,
+.control-center .notification-row:hover .notification-background .notification {
+  background: alpha(@surface2, 0.98);
+  border-color: @neon-cyan;
+}
+
+/* 5) Severity accents via a left neon bar */
+.control-center .notification-row .notification-background .notification.low,
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .notification.low {
+  border-left: 3px solid @overlay1;
+}
+.control-center .notification-row .notification-background .notification.normal,
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .notification.normal {
+  border-left: 3px solid @neon-blue;
+}
+.control-center
+  .notification-row
+  .notification-background
+  .notification.critical,
+.floating-notifications.background
+  .notification-row
+  .notification-background
+  .notification.critical {
+  border-left: 3px solid @neon-red;
+}
+
+/* 6) Text blocks */
+.control-center .notification-row .summary,
+.floating-notifications.background .notification-row .summary {
+  color: @text;
+  font-weight: 800;
+}
+.control-center .notification-row .body,
+.floating-notifications.background .notification-row .body {
+  color: @subtext1;
+}
+.control-center .notification-row .time,
+.floating-notifications.background .notification-row .time {
+  color: @overlay2;
+}
+
+/* 7) Close button matches your chip style */
+.notification-row .notification-background .close-button {
+  background: alpha(@surface1, 0.95);
+  color: @text;
+  border: 2px solid @overlay1;
+  border-radius: 8px;
+  transition:
+    background 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+.notification-row .notification-background .close-button:hover {
+  background: alpha(@neon-pink, 0.22);
+  border-color: @neon-pink;
+}
+.notification-row .notification-background .close-button:active {
+  background: alpha(@neon-cyan, 0.25);
+  border-color: @neon-cyan;
+}
+
+/* 8) Action buttons (default + extras) */
+.notification-default-action,
+.notification-action {
+  border-radius: 8px;
+  background: alpha(@surface1, 0.95);
+  color: @text;
+  border: 2px solid @overlay1;
+  padding: 6px 10px;
+}
+.notification-default-action:hover,
+.notification-action:hover {
+  background: alpha(@neon-pink, 0.22);
+  border-color: @neon-pink;
+}
+.notification-default-action.suggested-action,
+.notification-action.suggested-action {
+  border-color: @neon-cyan;
+}
+/* When extra actions are visible, square off the default action bottom */
+.notification-default-action:not(:only-child) {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* 9) Header + DND row (keeps your neon titles) */
+.control-center .widget-title {
+  color: @neon-yellow;
+  font-weight: 800;
+}
+.control-center .widget-title button:hover {
+  border-color: @neon-pink;
+}
+
+/* 10) Inputs / progress */
+progressbar trough,
+scale trough {
+  background: alpha(@surface2, 0.9);
+}
+progressbar trough > progress {
+  background: @neon-cyan;
+}
+
+/* 11) Backdrop: reduce glow when panel not focused */
+window#control-center:backdrop,
+window#notifications:backdrop {
+  box-shadow: none;
+  opacity: 0.98;
+}
