@@ -1,0 +1,31 @@
+# Safe GitHub-only pack (Local mods)
+# Lines starting with # are comments.
+
+# Peter Han - zipped release assets (Local Mod Download)
+https://github.com/peterhaneve/ONIMods/releases/download/ModUpdaterLatest/ModUpdater.zip
+https://github.com/peterhaneve/ONIMods/releases/download/ModsLatest/FastSave.zip
+https://github.com/peterhaneve/ONIMods/releases/download/ModsLatest/MismatchedFinder.zip
+https://github.com/peterhaneve/ONIMods/releases/download/ModsLatest/QueueForSink.zip
+https://github.com/peterhaneve/ONIMods/releases/download/ModsLatest/ShowRange.zip
+https://github.com/peterhaneve/ONIMods/releases/download/ModsLatest/ThermalTooltips.zip
+https://github.com/peterhaneve/ONIMods/releases/download/ModsLatest/StockBugFix.zip
+https://github.com/peterhaneve/ONIMods/releases/download/ModsLatest/SmartPumps.zip
+https://github.com/peterhaneve/ONIMods/releases/download/ModsLatest/NoSensorLimits.zip
+https://github.com/peterhaneve/ONIMods/releases/download/ModsLatest/SandboxTools.zip
+
+# Aze - zipped builds in repo Distribute/
+https://raw.githubusercontent.com/AzeTheGreat/ONI-Mods/master/Distribute/BetterInfoCards.zip
+https://raw.githubusercontent.com/AzeTheGreat/ONI-Mods/master/Distribute/BetterAutomationOverlay.zip
+https://raw.githubusercontent.com/AzeTheGreat/ONI-Mods/master/Distribute/SuppressNotifications.zip
+
+# Sgt Imalas - releases
+https://github.com/Sgt-Imalas/Sgt_Imalas-Oni-Mods/releases/latest/download/BlueprintsV2.zip
+
+# Sanchozz - releases
+https://github.com/SanchozzDeponianin/ONIMods/releases/latest/download/NoManualDelivery.zip
+
+# Extras via repo subdir (download repo zip, extract subfolder)
+ghsubdir:EtiamNullam/Etiam-ONI-Modpack@master:Mods/GasOverlay#name=GasOverlay
+ghsubdir:asquared31415/Cairath-ONI-Mods@master:src/GeyserCalculatedAverageOutput#name=GeyserCalculatedAverageOutput
+ghsubdir:asquared31415/Cairath-ONI-Mods@master:src/PlanBuildingsWithoutMaterials#name=PlanBuildingsWithoutMaterials
+

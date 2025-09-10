@@ -1,0 +1,160 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Oxygen Not Included (Steam AppID 457140)
+# Downloads specified Workshop mods and installs them into ONI's mods directory.
+
+find_workshop_src() {
+  # Usage: find_workshop_src <appid> <modid>
+  local appid="$1" modid="$2"
+  local candidates=(
+    "$HOME/.steam/steamapps/workshop/content/$appid/$modid"
+    "$HOME/.steam/SteamApps/workshop/content/$appid/$modid"
+    "$HOME/.local/share/Steam/steamapps/workshop/content/$appid/$modid"
+    "$HOME/.var/app/com.valvesoftware.Steam/.local/share/Steam/steamapps/workshop/content/$appid/$modid"
+    "$HOME/.steam/root/steamapps/workshop/content/$appid/$modid"
+    "$HOME/.steam/steamcmd/workshop/content/$appid/$modid"
+    "$HOME/.steam/steamcmd/steamapps/workshop/content/$appid/$modid"
+  )
+  local p
+  for p in "${candidates[@]}"; do
+    if [[ -d "$p" ]]; then
+      printf '%s' "$p"
+      return 0
+    fi
+  done
+  return 1
+}
+
+main() {
+  if [[ $# -eq 0 ]]; then
+    echo "Usage: oni-mod <WorkshopModID | WorkshopURL> [more IDs/URLs...]" >&2
+    return 1
+  fi
+
+  local appid=457140
+
+  # Detect ONI mods directory inside Wine/Lutris prefix under ~/Games.
+  # Auto-detect the Windows user within the prefix (often 'steamuser').
+  local prefix_root="$HOME/Games/oxygen-not-included/drive_c/users"
+  local mods_dir
+  if [[ -d "$prefix_root" ]]; then
+    # Prefer a user dir that contains the ONI Documents path; fallback to common names
+    local candidate_users=()
+    # Add users that actually have the ONI Documents path first
+    while IFS= read -r -d '' d; do
+      candidate_users+=("${d##*/}")
+    done < <(find "$prefix_root" -mindepth 1 -maxdepth 1 -type d -print0 2>/dev/null | \
+             xargs -0 -I{} bash -lc 'test -d "{}/Documents/Klei/OxygenNotIncluded" && printf "%s\0" "{}"' || true)
+    # Append common names to check if none matched
+    candidate_users+=(steamuser mastermind Public)
+    local user
+    for user in "${candidate_users[@]}"; do
+      [[ -d "$prefix_root/$user/Documents/Klei/OxygenNotIncluded" ]] || continue
+      mods_dir="$prefix_root/$user/Documents/Klei/OxygenNotIncluded/mods/Steam"
+      break
+    done
+    # If still empty, fallback to first user dir
+    if [[ -z "${mods_dir:-}" ]]; then
+      local first_user
+      first_user=$(find "$prefix_root" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' 2>/dev/null | head -n1 || true)
+      if [[ -n "$first_user" ]]; then
+        mods_dir="$prefix_root/$first_user/Documents/Klei/OxygenNotIncluded/mods/Steam"
+      fi
+    fi
+  fi
+  # Final fallback (last resort, may not exist but will be created)
+  : "${mods_dir:=$HOME/Games/oxygen-not-included/drive_c/users/steamuser/Documents/Klei/OxygenNotIncluded/mods/Steam}"
+  echo "Using ONI mods directory: $mods_dir"
+
+  if ! command -v steamcmd >/dev/null 2>&1; then
+    echo "steamcmd not found. Install it: yay -S steamcmd" >&2
+    return 1
+  fi
+
+  for input in "$@"; do
+    echo "──────────────────────────────────────────────"
+    echo "Processing: $input"
+
+    # Extract numeric ModID if a URL is passed
+    local modid="$input"
+    if [[ "$input" == http* ]]; then
+      modid="${input##*id=}"
+      modid="${modid%%[^0-9]*}"
+    fi
+    if ! [[ "$modid" =~ ^[0-9]+$ ]]; then
+      echo "Could not parse a numeric ModID from: $input" >&2
+      continue
+    fi
+
+    # If content already exists locally in any workshop content folder, use it without downloading
+    local src=""
+    src="$(find_workshop_src "$appid" "$modid" || true)"
+    if [[ -n "$src" ]]; then
+      echo ">>> Found existing workshop content: $src (skipping download)"
+    else
+      echo ">>> Downloading mod $modid via SteamCMD..."
+    fi
+    # Retry a few times to tolerate transient timeouts
+    if [[ -z "$src" ]]; then
+      local attempt=1 max_attempts=3
+      local scmd_status=1
+      while (( attempt <= max_attempts )); do
+        echo "steamcmd attempt $attempt/$max_attempts"
+        if steamcmd +login anonymous +workshop_download_item "$appid" "$modid" validate +quit; then
+          scmd_status=0
+          break
+        fi
+        (( attempt++ ))
+        sleep 2
+      done
+      if (( scmd_status != 0 )); then
+        echo "!!! steamcmd failed for $modid after $max_attempts attempts" >&2
+      fi
+    fi
+
+    # Candidate workshop roots
+    # Resolve first existing path (re-check after possible download)
+    if [[ -z "$src" ]]; then
+      src="$(find_workshop_src "$appid" "$modid" || true)"
+    fi
+
+    if [[ -z "$src" ]]; then
+      echo "!!! Downloaded path not found for $modid. Checked:" >&2
+      printf ' - %s\n' "${candidates[@]}" >&2
+      echo "Tip: run 'find ~/.steam ~/.local/share/Steam ~/.var/app/com.valvesoftware.Steam -type d -name $modid' to locate it." >&2
+      continue
+    fi
+
+    # Determine a display name from mod_info.yaml (optional)
+    local display_name="mod_$modid"
+    if [[ -f "$src/mod_info.yaml" ]]; then
+      # Try to parse a 'title:' field (simple YAML)
+      local t
+      t=$(awk -F: '/^\s*title\s*:/ { $1=""; sub(/^\s+/, "", $0); print; exit }' "$src/mod_info.yaml" | tr -d '\r') || true
+      [[ -n "$t" ]] && display_name="$t"
+    fi
+
+    local dest="$mods_dir/$modid"
+    echo ">>> Installing to: $dest"
+    mkdir -p "$mods_dir"
+    rm -rf "$dest"
+    if command -v rsync >/dev/null 2>&1; then
+      rsync -a --delete "$src"/ "$dest"/
+    else
+      mkdir -p "$dest"
+      cp -a "$src"/. "$dest"/
+    fi
+
+    if [[ -d "$dest" ]]; then
+      echo "✅ Installed '$display_name' as id $modid."
+    else
+      echo "❌ Install failed for $modid" >&2
+    fi
+  done
+
+  echo "──────────────────────────────────────────────"
+  echo "All done. Enable mods in ONI's mods screen."
+}
+
+main "$@"

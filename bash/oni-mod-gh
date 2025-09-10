@@ -1,0 +1,250 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Install Oxygen Not Included mods from GitHub sources into Local mods.
+# Supports:
+#  - Direct .zip URLs (e.g., GitHub release assets or raw file URLs)
+#  - GitHub repo subdirectory spec via:
+#      ghsubdir:OWNER/REPO@REF:SUBDIR[#name=DESTNAME]
+#    Example:
+#      ghsubdir:EtiamNullam/Etiam-ONI-Modpack@master:Mods/GasOverlay#name=GasOverlay
+#
+# Usage:
+#   oni-mod-gh [-f config.txt] [source ...]
+#
+# Config format: one source per line, comments starting with '#', blank lines ignored.
+
+usage() {
+  cat >&2 <<'USAGE'
+Usage: oni-mod-gh [-f config.txt] [sources...]
+
+Sources can be:
+  - https://.../SomeMod.zip
+  - ghsubdir:owner/repo@ref:subdir[#name=DestName]
+
+Installs into ONI Local mods directory.
+USAGE
+}
+
+# Detect ONI 'Local' mods directory under Lutris/Wine prefix in ~/Games
+detect_local_mods_dir() {
+  local prefix_root="$HOME/Games/oxygen-not-included/drive_c/users"
+  local base
+  if [[ -d "$prefix_root" ]]; then
+    # Prefer users that already have ONI Documents path
+    while IFS= read -r -d '' d; do
+      base="$d/Documents/Klei/OxygenNotIncluded/mods/Local"
+      if [[ -d "${d}/Documents/Klei/OxygenNotIncluded" ]]; then
+        printf '%s' "$base"
+        return 0
+      fi
+    done < <(find "$prefix_root" -mindepth 1 -maxdepth 1 -type d -print0 2>/dev/null)
+    # Fallback common names
+    for u in steamuser mastermind Public; do
+      base="$prefix_root/$u/Documents/Klei/OxygenNotIncluded/mods/Local"
+      if [[ -d "$prefix_root/$u/Documents/Klei/OxygenNotIncluded" ]]; then
+        printf '%s' "$base"
+        return 0
+      fi
+    done
+    # Last resort fallback
+    printf '%s' "$prefix_root/steamuser/Documents/Klei/OxygenNotIncluded/mods/Local"
+    return 0
+  fi
+  # If prefix is missing, still return a sane default; script will create it
+  printf '%s' "$HOME/Games/oxygen-not-included/drive_c/users/steamuser/Documents/Klei/OxygenNotIncluded/mods/Local"
+}
+
+# Download a URL to a temp file
+fetch_url() {
+  local url="$1" out="$2"
+  if command -v curl >/dev/null 2>&1; then
+    curl -fL --retry 3 --retry-delay 2 -o "$out" "$url"
+    return 0
+  elif command -v wget >/dev/null 2>&1; then
+    wget -O "$out" "$url"
+    return 0
+  else
+    echo "Neither curl nor wget is available." >&2
+    return 1
+  fi
+}
+
+# Extract a zip archive into a destination directory
+extract_zip() {
+  local zip="$1" dest="$2"
+  mkdir -p "$dest"
+  if command -v unzip >/dev/null 2>&1; then
+    unzip -q -o "$zip" -d "$dest"
+  elif command -v bsdtar >/dev/null 2>&1; then
+    bsdtar -xf "$zip" -C "$dest"
+  else
+    echo "Need 'unzip' or 'bsdtar' to extract archives. Install unzip." >&2
+    return 1
+  fi
+}
+
+# Copy helper with rsync fallback
+copy_into() {
+  local src="$1" dest="$2"
+  mkdir -p "$dest"
+  if command -v rsync >/dev/null 2>&1; then
+    rsync -a --delete "$src"/ "$dest"/
+  else
+    # remove existing then copy
+    rm -rf "$dest"
+    mkdir -p "$dest"
+    cp -a "$src"/. "$dest"/
+  fi
+}
+
+# Handle direct zip URL
+install_zip_url() {
+  local url="$1" mods_local_dir="$2"
+  local tmpdir; tmpdir=$(mktemp -d)
+  local zfile="$tmpdir/pkg.zip"
+  echo ">>> Downloading: $url"
+  fetch_url "$url" "$zfile"
+
+  local extract_dir="$tmpdir/extracted"
+  extract_zip "$zfile" "$extract_dir"
+
+  # Determine top-level contents
+  local top_count top_first
+  top_count=$(find "$extract_dir" -mindepth 1 -maxdepth 1 -printf '.' | wc -c | tr -d ' ')
+  top_first=$(find "$extract_dir" -mindepth 1 -maxdepth 1 -print | head -n1 || true)
+
+  local base_name dest
+  base_name=$(basename "${url%%\?*}")
+  base_name="${base_name%.zip}"
+
+  if [[ $top_count -eq 1 && -d "$top_first" ]]; then
+    dest="$mods_local_dir/$(basename "$top_first")"
+    echo ">>> Installing to: $dest (from single folder in zip)"
+    copy_into "$top_first" "$dest"
+  else
+    dest="$mods_local_dir/$base_name"
+    echo ">>> Installing to: $dest (zip had multiple items)"
+    copy_into "$extract_dir" "$dest"
+  fi
+
+  rm -rf "$tmpdir"
+  echo "✅ Installed: $dest"
+}
+
+# Handle GitHub repo subdirectory spec
+# Spec: ghsubdir:owner/repo@ref:subdir[#name=DestName]
+install_gh_subdir() {
+  local spec="$1" mods_local_dir="$2"
+
+  local rest="${spec#ghsubdir:}"
+  local repo_ref="${rest%%:*}"    # owner/repo@ref
+  local subdir_name dest_name
+  subdir_name="${rest#*:}"         # subdir[#name=DestName]
+  if [[ "$subdir_name" == *#name=* ]]; then
+    dest_name="${subdir_name#*#name=}"
+    subdir_name="${subdir_name%%#name=*}"
+  fi
+
+  local owner_repo="${repo_ref%@*}"
+  local ref="${repo_ref#*@}"
+  [[ "$ref" != "$repo_ref" ]] || ref="master"
+
+  local owner="${owner_repo%%/*}" repo="${owner_repo#*/}"
+  if [[ -z "$owner" || -z "$repo" ]]; then
+    echo "Bad ghsubdir spec (owner/repo missing): $spec" >&2
+    return 1
+  fi
+
+  local zip_url="https://codeload.github.com/$owner/$repo/zip/refs/heads/$ref"
+  local tmpdir; tmpdir=$(mktemp -d)
+  local zfile="$tmpdir/src.zip"
+  echo ">>> Fetching repo zip: $zip_url"
+  fetch_url "$zip_url" "$zfile"
+
+  local extract_dir="$tmpdir/extracted"
+  extract_zip "$zfile" "$extract_dir"
+
+  # Repo zips extract into "$repo-$ref" top-level folder
+  local repo_root="$extract_dir/$repo-$ref"
+  local src_path="$repo_root/$subdir_name"
+  if [[ ! -d "$src_path" ]]; then
+    echo "Subdir not found in repo: $src_path (spec: $spec)" >&2
+    return 1
+  fi
+
+  local final_name
+  if [[ -n "${dest_name:-}" ]]; then
+    final_name="$dest_name"
+  else
+    final_name="$(basename "$subdir_name")"
+  fi
+  local dest="$mods_local_dir/$final_name"
+  echo ">>> Installing to: $dest (from repo subdir)"
+  copy_into "$src_path" "$dest"
+
+  rm -rf "$tmpdir"
+  echo "✅ Installed: $dest"
+}
+
+main() {
+  local cfg=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -f|--file) cfg="$2"; shift 2;;
+      -h|--help) usage; exit 0;;
+      --) shift; break;;
+      -*) echo "Unknown option: $1" >&2; usage; exit 1;;
+      *) break;;
+    esac
+  done
+
+  local inputs=()
+  if [[ -n "$cfg" ]]; then
+    if [[ ! -f "$cfg" ]]; then
+      echo "Config not found: $cfg" >&2
+      exit 1
+    fi
+    while IFS= read -r line || [[ -n "$line" ]]; do
+      line="${line%%#*}"            # strip comments
+      line="${line%%$'\r'}"        # strip CR
+      [[ -n "$line" ]] || continue  # skip blanks
+      inputs+=("$line")
+    done < "$cfg"
+  fi
+
+  # Remaining args also count as inputs
+  if [[ $# -gt 0 ]]; then
+    inputs+=("$@")
+  fi
+
+  if [[ ${#inputs[@]} -eq 0 ]]; then
+    usage
+    exit 1
+  fi
+
+  local mods_local_dir
+  mods_local_dir=$(detect_local_mods_dir)
+  echo "Using ONI Local mods directory: $mods_local_dir"
+  mkdir -p "$mods_local_dir"
+
+  local src
+  for src in "${inputs[@]}"; do
+    echo "──────────────────────────────────────────────"
+    echo "Source: $src"
+    if [[ "$src" == ghsubdir:* ]]; then
+      install_gh_subdir "$src" "$mods_local_dir" || echo "❌ Failed: $src" >&2
+    elif [[ "$src" =~ ^https?://.*\.zip(\?.*)?$ ]]; then
+      install_zip_url "$src" "$mods_local_dir" || echo "❌ Failed: $src" >&2
+    else
+      echo "Unrecognized source format: $src" >&2
+      echo "Tip: use a direct .zip URL or ghsubdir:owner/repo@ref:subdir[#name=Dest]" >&2
+    fi
+  done
+
+  echo "──────────────────────────────────────────────"
+  echo "All done. Enable Local mods in ONI's mods screen."
+}
+
+main "$@"
+

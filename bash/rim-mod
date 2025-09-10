@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+main() {
+  if [[ $# -eq 0 ]]; then
+    echo "Usage: rim-mod <WorkshopModID | WorkshopURL> [more IDs/URLs...]" >&2
+    return 1
+  fi
+
+  local appid=294100
+  local mods_dir="$HOME/Games/rimworld/drive_c/Program Files (x86)/RimWorld/Mods"
+
+  if ! command -v steamcmd >/dev/null 2>&1; then
+    echo "steamcmd not found. Install it: yay -S steamcmd" >&2
+    return 1
+  fi
+
+  for input in "$@"; do
+    echo "──────────────────────────────────────────────"
+    echo "Processing: $input"
+
+    # Extract ModID if URL was passed
+    local modid="$input"
+    if [[ "$input" == http* ]]; then
+      modid="${input##*id=}"
+      modid="${modid%%[^0-9]*}"
+    fi
+    if ! [[ "$modid" =~ ^[0-9]+$ ]]; then
+      echo "Could not parse a numeric ModID from: $input" >&2
+      continue
+    fi
+
+    echo ">>> Downloading mod $modid via SteamCMD..."
+    steamcmd +login anonymous +workshop_download_item "$appid" "$modid" +quit
+
+    # Candidate workshop roots
+    local candidates=(
+      "$HOME/.steam/steamapps/workshop/content/$appid/$modid"
+      "$HOME/.steam/SteamApps/workshop/content/$appid/$modid"
+      "$HOME/.local/share/Steam/steamapps/workshop/content/$appid/$modid"
+    )
+
+    # Resolve first existing path
+    local src=""
+    local p
+    for p in "${candidates[@]}"; do
+      if [[ -d "$p" ]]; then
+        src="$p"
+        break
+      fi
+    done
+
+    if [[ -z "$src" ]]; then
+      echo "!!! Downloaded path not found for $modid. Checked:" >&2
+      printf ' - %s\n' "${candidates[@]}" >&2
+      echo "Tip: run 'find ~/.steam ~/.local/share/Steam -type d -name $modid' to locate it." >&2
+      continue
+    fi
+
+    # Read mod name from About.xml
+    local modname="mod_$modid"
+    local about="$src/About/About.xml"
+    if [[ -f "$about" ]]; then
+      local n
+      # shellcheck disable=SC2016
+      n=$(grep -oPm1 '(?<=<name>)[^<]+' "$about" 2>/dev/null | tr -d $'\r' | sed 's/[[:space:]]\+$//')
+      [[ -n "$n" ]] && modname="$n"
+    fi
+
+    local dest="$mods_dir/$modname"
+    echo ">>> Installing to: $dest"
+    mkdir -p "$mods_dir"
+    rm -rf "$dest"
+    rsync -a --delete "$src"/ "$dest"/
+
+    if [[ -d "$dest" ]]; then
+      echo "✅ Installed '$modname'."
+    else
+      echo "❌ Install failed for $modid" >&2
+    fi
+  done
+
+  echo "──────────────────────────────────────────────"
+  echo "All done. Enable mods in RimWorld's mod menu."
+}
+
+main "$@"
+
