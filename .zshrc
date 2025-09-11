@@ -77,11 +77,11 @@ export VISUAL='nvim'
 # alias zshconfig="nvim ~/.zshrc"
 # alias ohmyzsh="nvim ~/.oh-my-zsh"
 
-# Aliases for `exa` with icons and colors
-alias ls="exa --icons"
-alias la="exa --icons -a"       # Show hidden files
-alias ll="exa --icons -la"      # Long format with hidden files
-alias lt="exa --icons --tree"   # Display a tree view
+# Aliases for `eza` (replacement for unmaintained exa) with icons and colors
+alias ls="eza --icons"
+alias la="eza --icons -a"       # Show hidden files
+alias ll="eza --icons -la"      # Long format with hidden files
+alias lt="eza --icons --tree"   # Display a tree view
 
 
 # shorhand aliases

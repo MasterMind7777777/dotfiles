@@ -1,8 +1,23 @@
 bash/python/i3ipc_project/i3ipc_venv/
 bash/i3/venv/
 bash/notes/venv/
+bash/i3/logs/
 
 # Codex CLI runtime data (ignore all except config)
 .codex/*
 !.codex/config.toml
 !.codex/AGENTS.md
+
+# Explicitly ignore Codex runtime artifacts/tokens
+.codex/history.jsonl
+.codex/auth.json
+
+# Common local caches
+.cache/
+
+# Neovim generated files (packer, if ever used)
+.config/nvim/plugin/packer_compiled.lua
+
+# OS junk files
+.DS_Store
+Thumbs.db
