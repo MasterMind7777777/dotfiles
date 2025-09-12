@@ -4,7 +4,9 @@
   border: none;
   border-radius: 10px;
   /* Prefer a clean, modern sans; keep Nerd Font for icons */
-  font-family: "Inter", "IBM Plex Sans", "Manrope", "JetBrainsMono Nerd Font", "Symbols Nerd Font", "Noto Color Emoji", sans-serif;
+  font-family:
+    "Inter", "IBM Plex Sans", "Manrope", "JetBrainsMono Nerd Font",
+    "Symbols Nerd Font", "Noto Color Emoji", sans-serif;
   font-size: 15px;
   min-height: 10px;
 }
@@ -14,7 +16,8 @@ window#waybar {
 }
 
 /* Window Title (Niri/Window module) */
-#window, #niri-window {
+#window,
+#niri-window {
   margin-top: 10px;
   margin-left: 8px;
   padding-left: 10px;
@@ -22,7 +25,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   color: @neon-magenta;
   border-bottom: 3px;
   border-style: solid;
@@ -30,7 +33,8 @@ window#waybar {
   transition: 0.3s;
 }
 
-#window:hover, #niri-window:hover {
+#window:hover,
+#niri-window:hover {
   color: @base;
   background: alpha(@neon-magenta, 0.85);
 }
@@ -43,7 +47,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   color: @neon-cyan;
   border-bottom: 3px;
   border-style: solid;
@@ -64,7 +68,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   color: @neon-green;
   border-bottom: 3px;
   border-style: solid;
@@ -85,7 +89,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   color: @neon-orange;
   border-bottom: 3px;
   border-style: solid;
@@ -111,7 +115,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   color: @neon-purple;
   border-bottom: 3px;
   border-style: solid;
@@ -127,7 +131,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   color: @neon-pink;
   border-bottom: 3px;
   border-style: solid;
@@ -148,7 +152,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   color: @neon-blue;
   padding: 8px;
   border-bottom: 3px;
@@ -164,7 +168,7 @@ window#waybar {
 
 #pulseaudio.muted {
   color: @neon-red;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   border-bottom: 3px;
   border-style: solid;
   border-color: @neon-red;
@@ -174,7 +178,6 @@ window#waybar {
 #pulseaudio.muted:hover {
   background: alpha(@neon-red, 0.85);
   color: @base;
-
 }
 
 #clock {
@@ -185,16 +188,20 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   color: @neon-yellow;
   border-bottom: 3px;
   border-style: solid;
   border-color: @neon-yellow;
   transition: 0.3s;
   /* Dedicated clock font: clean UI sans, bold for readability */
-  font-family: "IBM Plex Sans", "Inter", "Manrope", "JetBrainsMono Nerd Font", "Symbols Nerd Font", sans-serif;
+  font-family:
+    "IBM Plex Sans", "Inter", "Manrope", "JetBrainsMono Nerd Font",
+    "Symbols Nerd Font", sans-serif;
   font-weight: 700;
 }
+
+/* (reverted) icons injected via config formats */
 
 #clock:hover {
   color: @base;
@@ -209,7 +216,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   color: @neon-purple;
   border-bottom: 3px;
   border-style: solid;
@@ -230,7 +237,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   color: @overlay0;
   border-bottom: 3px;
   border-style: solid;
@@ -246,7 +253,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   color: @overlay2;
   border-bottom: 3px;
   border-style: solid;
@@ -266,12 +273,12 @@ window#waybar {
 }
 
 #idle_inhibitor.deactivated {
-  color: @overlay2
+  color: @overlay2;
 }
 
 #idle_inhibitor.deactivated:hover {
   color: @base;
-  background: alpha(@overlay2, 0.60);
+  background: alpha(@overlay2, 0.6);
 }
 
 #memory {
@@ -282,7 +289,7 @@ window#waybar {
   padding-right: 10px;
   border-radius: 10px;
   transition: none;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   color: @neon-purple;
   border-bottom: 3px;
   border-style: solid;
@@ -293,7 +300,6 @@ window#waybar {
 #memory:hover {
   color: @base;
   background: alpha(@neon-purple, 0.85);
-
 }
 
 #cpu {
@@ -304,7 +310,7 @@ window#waybar {
   padding-right: 10px;
   border-radius: 10px;
   transition: none;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   color: @neon-green;
   border-bottom: 3px;
   border-style: solid;
@@ -315,7 +321,6 @@ window#waybar {
 #cpu:hover {
   color: @base;
   background: alpha(@neon-green, 0.85);
-
 }
 
 #custom-launcher {
@@ -327,7 +332,7 @@ window#waybar {
   border-radius: 10px;
   transition: none;
   color: @neon-yellow;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   transition: 0.3s;
   border-bottom: 3px;
   border-style: solid;
@@ -341,7 +346,7 @@ window#waybar {
 
 #network.disconnected {
   color: @neon-red;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   border-bottom: 3px;
   border-style: solid;
   border-color: @neon-red;
@@ -359,7 +364,7 @@ window#waybar {
   margin-left: 8px;
   padding-left: 4px;
   padding-right: 4px;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   border-bottom: 3px;
   border-style: solid;
   border-color: @neon-yellow;
@@ -402,18 +407,25 @@ window#waybar {
   background: transparent;
   box-shadow: none;
   /* Collapse visual width for empty slots */
-  min-width: 6px;
-  padding: 0 2px;
-  margin: 0 2px;
+  min-width: 1px;
+  padding: 0 1px;
+  margin: 0 1px;
   /* Make the number effectively invisible without breaking layout */
+  font-size: 0.01px;
+}
+#workspaces button.empty:hover {
+  background: transparent;
+}
+#workspaces button.empty label {
+  color: transparent;
+  opacity: 0;
   font-size: 1px;
 }
-#workspaces button.empty:hover { background: transparent; }
-#workspaces button.empty label { color: transparent; opacity: 0; font-size: 1px; }
 
 /* Active workspace: different font, bolder and slightly larger */
 #workspaces button.active {
-  font-family: "Manrope", "Inter", "IBM Plex Sans", "JetBrainsMono Nerd Font", sans-serif;
+  font-family:
+    "Manrope", "Inter", "IBM Plex Sans", "JetBrainsMono Nerd Font", sans-serif;
   font-weight: 800;
   font-size: 110%;
   color: @base;
@@ -429,7 +441,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   color: @overlay1;
   border-bottom: 3px;
   border-style: solid;
@@ -445,7 +457,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   color: @overlay1;
   border-bottom: 3px;
   border-style: solid;
@@ -463,7 +475,7 @@ window#waybar {
   margin-bottom: 0px;
   border-radius: 10px;
   transition: none;
-  background: alpha(@surface0, 0.60);
+  background: alpha(@surface0, 0.6);
   color: @neon-pink;
   border-bottom: 3px;
   border-style: solid;

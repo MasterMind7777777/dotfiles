@@ -6,7 +6,7 @@
     // "width": 1280, // Waybar width
     // Choose the order of the modules
     "modules-left": ["custom/launcher", "niri/workspaces"],
-    "modules-center": ["clock"],
+    "modules-center": ["clock#date", "clock#time"],
     "modules-right": ["niri/window", "pulseaudio", "network", "backlight", "battery", "niri/language", "custom/swaync"],
     "niri/workspaces": {
         "format": "{name}",
@@ -31,10 +31,16 @@
         "format": "{title}",
         "max-length": 80
     },
-    "clock": {
+    "clock#date": {
         "timezone": "America/Argentina/Buenos_Aires",
         "tooltip": false,
-        "format": " {:%A %d %B (%m) %Y %H:%M:%S}",
+        "format": " {:%A %d %B (%m) %Y}",
+        "on-click": "TZ=America/Argentina/Buenos_Aires date '+%F' | wl-copy"
+    },
+    "clock#time": {
+        "timezone": "America/Argentina/Buenos_Aires",
+        "tooltip": false,
+        "format": " {:%H:%M}",
         "on-click": "TZ=America/Argentina/Buenos_Aires date '+%F %T' | wl-copy"
     },
     "backlight": {
@@ -100,7 +106,7 @@
     "layer": "top",
     "position": "top",
     "modules-left": ["custom/launcher", "niri/workspaces"],
-    "modules-center": ["clock"],
+    "modules-center": ["clock#date", "clock#time"],
     "modules-right": ["niri/window", "pulseaudio", "network", "backlight", "battery", "niri/language", "custom/swaync"],
     "niri/workspaces": {
         "format": "{name}",
@@ -109,7 +115,8 @@
     "niri/window": { "format": "{title}", "max-length": 80 },
     "custom/launcher": { "format": " ", "on-click": "fuzzel --config ~/.config/fuzzel/launcher.ini || pkill fuzzel", "on-click-right": "pkill fuzzel", "tooltip": false },
     "custom/music": { "format": "  {}", "escape": true, "interval": 5, "tooltip": false, "exec": "playerctl metadata --format='{{ title }}'", "on-click": "playerctl play-pause", "max-length": 50 },
-    "clock": { "timezone": "America/Argentina/Buenos_Aires", "tooltip": false, "format": " {:%A %d %B (%m) %Y %H:%M:%S}", "on-click": "TZ=America/Argentina/Buenos_Aires date '+%F %T' | wl-copy" },
+    "clock#date": { "timezone": "America/Argentina/Buenos_Aires", "tooltip": false, "format": " {:%A %d %B (%m) %Y}", "on-click": "TZ=America/Argentina/Buenos_Aires date '+%F' | wl-copy" },
+    "clock#time": { "timezone": "America/Argentina/Buenos_Aires", "tooltip": false, "format": " {:%H:%M}", "on-click": "TZ=America/Argentina/Buenos_Aires date '+%F %T' | wl-copy" },
     "backlight": { "device": "amdgpu_bl1", "format": "{icon} {percent}%", "format-alt": "{icon}", "tooltip": false, "format-icons": ["", "", "", "", "", "", "", "", ""] },
     "battery": { "interval": 30, "states": { "warning": 20, "critical": 10 }, "format": "{icon} {capacity}%", "format-charging": "󰂄 {capacity}%", "format-plugged": " {capacity}%", "format-alt": "{icon}", "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"] },
     "pulseaudio": { "format": "{icon} {volume}%", "format-muted": " ", "format-icons": { "default": ["", "", ""] }, "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle", "on-click-right": "pavucontrol" },
