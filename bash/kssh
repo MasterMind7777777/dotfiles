@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -lt 1 ]]; then
+  echo "Usage: kssh user@host [tmux-session]" >&2
+  exit 2
+fi
+
+target="$1"
+session="${2:-main}"
+
+# Keepalive tuning (env-overridable)
+ALIVE_INTERVAL="${KSSH_ALIVE_INTERVAL:-5}"   # seconds between heartbeats
+ALIVE_COUNT="${KSSH_ALIVE_COUNT:-2}"         # missed heartbeats before disconnect
+
+# Exit cleanly on Ctrl-C from local side
+trap 'exit 130' INT
+
+while true; do
+  # Allow ssh to fail without set -e killing the loop
+  set +e
+  kitty +kitten ssh -tt \
+    -o ServerAliveInterval="${ALIVE_INTERVAL}" \
+    -o ServerAliveCountMax="${ALIVE_COUNT}" \
+    -o TCPKeepAlive=yes \
+    -o ControlMaster=no \
+    -o ControlPersist=no \
+    -o GSSAPIAuthentication=no \
+    -o PreferredAuthentications=publickey,keyboard-interactive \
+    -o ConnectTimeout=5 \
+    -o ConnectionAttempts=1 \
+    -o IPQoS=none \
+    -o LogLevel=ERROR \
+    "$target" -- tmux new -A -s "$session"
+  code=$?
+  set -e
+
+  # 0: clean exit (e.g., you detached); 130: you pressed Ctrl-C locally
+  if [[ $code -eq 0 || $code -eq 130 ]]; then
+    exit $code
+  fi
+
+  # Any other non-zero: treat as transport failure and retry
+  echo "kssh: ssh/tmux exited with status $code; reconnecting in 2s..." >&2
+  sleep 2
+done

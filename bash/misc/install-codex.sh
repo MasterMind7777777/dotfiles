@@ -56,6 +56,7 @@ sudo_if_needed() {
   else
     if command -v sudo >/dev/null 2>&1; then
       echo "Elevating with sudo to write to $1…"
+      shift
       sudo "$@"
     else
       echo "Destination $1 not writable and 'sudo' not found." >&2

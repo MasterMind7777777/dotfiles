@@ -1,0 +1,315 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Resolve directory of this script to call sibling rim-mod reliably
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+
+usage() {
+  cat >&2 <<'EOF'
+Usage: rim-modpack [options] <WorkshopCollectionID | WorkshopURL> [more IDs/URLs...]
+
+Options:
+  -n, --dry-run          List resolved mod IDs; do not install
+  -r, --recurse          Include nested collections (type 2)
+  -v, --verify           Check Mods folder contains exactly these mods
+  -i, --install-missing  Install only missing mods (skip ones present)
+  -h, --help             Show this help
+
+Defaults: direct mods only (no recursion).
+EOF
+}
+
+require_cmd() {
+  if ! command -v "$1" >/dev/null 2>&1; then
+    echo "Missing required command: $1" >&2
+    exit 1
+  fi
+}
+
+# Fetch collection details JSON for a given collection ID
+fetch_collection_json() {
+  local cid="$1"
+  curl -sS -A "rim-modpack/1.0 (+https://steamcommunity.com)" \
+    -X POST \
+    -d "collectioncount=1" \
+    --data-urlencode "publishedfileids[0]=$cid" \
+    "https://api.steampowered.com/ISteamRemoteStorage/GetCollectionDetails/v1/"
+}
+
+# Print workshop mod IDs (type 0) for a collection.
+_collect_mod_ids_direct() {
+  local cid="$1"
+  local json
+  json=$(fetch_collection_json "$cid") || return 1
+
+  # If API returned nothing usable, bail early
+  if ! echo "$json" | jq -e '.response.collectiondetails[0] | type=="object"' >/dev/null 2>&1; then
+    return 0
+  fi
+
+  echo "$json" | jq -r '(
+      .response.collectiondetails[0].children // []
+    )
+    | map(select(.filetype==0))
+    | .[].publishedfileid'
+}
+
+# Recursively collect mod IDs (type 0), following nested collections (filetype 2)
+_collect_mod_ids_recursive() {
+  local cid="$1"
+  local json
+  json=$(fetch_collection_json "$cid") || return 1
+
+  if ! echo "$json" | jq -e '.response.collectiondetails[0] | type=="object"' >/dev/null 2>&1; then
+    return 0
+  fi
+
+  echo "$json" | jq -r '(
+      .response.collectiondetails[0].children // []
+    )
+    | .[] | "\(.publishedfileid) \(.filetype)"' \
+    | while read -r child_id filetype; do
+        if [[ "$filetype" == "2" ]]; then
+          _collect_mod_ids_recursive "$child_id"
+        else
+          echo "$child_id"
+        fi
+      done
+}
+
+# Extract a numeric ID if a full URL was passed
+normalize_id() {
+  local input="$1"
+  if [[ "$input" == http* ]]; then
+    input="${input##*id=}"
+    input="${input%%[^0-9]*}"
+  fi
+  echo "$input"
+}
+
+# Resolve workshop base path (first existing among candidates)
+resolve_workshop_base() {
+  local appid=294100
+  local candidates=(
+    "$HOME/.steam/steamapps/workshop/content/$appid"
+    "$HOME/.steam/SteamApps/workshop/content/$appid"
+    "$HOME/.local/share/Steam/steamapps/workshop/content/$appid"
+  )
+  local p
+  for p in "${candidates[@]}"; do
+    if [[ -d "$p" ]]; then
+      echo "$p"
+      return 0
+    fi
+  done
+  return 1
+}
+
+# Extract mod name from a workshop item's About.xml (fallback to mod_<id>)
+mod_name_from_about() {
+  local src_dir="$1"; shift || true
+  local modid="$1"; shift || true
+  local about="$src_dir/About/About.xml"
+  local name=""
+  if [[ -f "$about" ]]; then
+    # shellcheck disable=SC2016
+    name=$(grep -oPm1 '(?<=<name>)[^<]+' "$about" 2>/dev/null | tr -d $'\r' | sed 's/[[:space:]]\+$//') || true
+  fi
+  if [[ -z "$name" ]]; then
+    name="mod_${modid}"
+  fi
+  # Sanitize to match rim-mod installation folder naming
+  printf '%s' "$name" | sed -E 's#[/\\]+# - #g; s/  +/ /g; s/^[[:space:]]+|[[:space:]]+$//g'
+}
+
+# Verify that Mods directory has exactly the resolved set
+verify_exact_set() {
+  local -a ids=("$@")
+  local mods_dir="$HOME/Games/rimworld/drive_c/Program Files (x86)/RimWorld/Mods"
+
+  if [[ ! -d "$mods_dir" ]]; then
+    echo "Mods directory missing: $mods_dir" >&2
+    return 2
+  fi
+
+  local base
+  if ! base=$(resolve_workshop_base); then
+    echo "Workshop content path not found for app 294100" >&2
+    return 2
+  fi
+
+  # Build expected names by reading About.xml under workshop base
+  local expected_names_file
+  expected_names_file=$(mktemp)
+  local id
+  for id in "${ids[@]}"; do
+    local src="$base/$id"
+    if [[ ! -d "$src" ]]; then
+      echo "WARNING: workshop source missing for id=$id at $src" >&2
+    fi
+    local name
+    name=$(mod_name_from_about "$src" "$id")
+    printf '%s\n' "$name" >>"$expected_names_file"
+  done
+
+  # Installed names = basenames of directories under Mods
+  local installed_names_file
+  installed_names_file=$(mktemp)
+  find "$mods_dir" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | LC_ALL=C sort -u >"$installed_names_file"
+
+  # Sort expected
+  LC_ALL=C sort -u -o "$expected_names_file" "$expected_names_file"
+
+  # Compute differences
+  local missing_file extra_file
+  missing_file=$(mktemp)
+  extra_file=$(mktemp)
+  comm -23 "$expected_names_file" "$installed_names_file" >"$missing_file"  # in expected, not installed
+  comm -13 "$expected_names_file" "$installed_names_file" >"$extra_file"    # in installed, not expected
+
+  local expected_count installed_count missing_count extra_count
+  expected_count=$(wc -l <"$expected_names_file" | tr -d ' ')
+  installed_count=$(wc -l <"$installed_names_file" | tr -d ' ')
+  missing_count=$(wc -l <"$missing_file" | tr -d ' ')
+  extra_count=$(wc -l <"$extra_file" | tr -d ' ')
+
+  echo "Verification summary:"
+  echo " - expected mods: $expected_count"
+  echo " - installed dirs: $installed_count"
+  echo " - missing: $missing_count"
+  echo " - extra: $extra_count"
+
+  if [[ "$missing_count" -gt 0 ]]; then
+    echo "Missing (expected but not installed):"
+    sed -n '1,200p' "$missing_file"
+  fi
+  if [[ "$extra_count" -gt 0 ]]; then
+    echo "Extra (installed but not expected):"
+    sed -n '1,200p' "$extra_file"
+  fi
+
+  # Exit non-zero if not exact match
+  if [[ "$missing_count" -eq 0 && "$extra_count" -eq 0 ]]; then
+    return 0
+  else
+    return 3
+  fi
+}
+
+main() {
+  if [[ $# -eq 0 ]]; then
+    usage
+    exit 1
+  fi
+
+  local recurse=false
+  local dryrun=false
+  local verify=false
+  local install_missing=false
+
+  # Parse flags
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -r|--recurse|--include-nested)
+        recurse=true; shift ;;
+      -n|--dry-run)
+        dryrun=true; shift ;;
+      -v|--verify)
+        verify=true; shift ;;
+      -i|--install-missing)
+        install_missing=true; shift ;;
+      -h|--help)
+        usage; exit 0 ;;
+      --) shift; break ;;
+      -*) echo "Unknown option: $1" >&2; usage; exit 2 ;;
+      *) break ;;
+    esac
+  done
+
+  require_cmd curl
+  require_cmd jq
+
+  if [[ ! -x "$SCRIPT_DIR/rim-mod" ]]; then
+    echo "Expected executable: $SCRIPT_DIR/rim-mod" >&2
+    echo "Please ensure rim-mod is present and executable." >&2
+    exit 1
+  fi
+
+  # Aggregate all mod IDs across provided collections
+  mapfile -t all_ids < <(
+    for raw in "$@"; do
+      cid=$(normalize_id "$raw")
+      if ! [[ "$cid" =~ ^[0-9]+$ ]]; then
+        echo "Skipping invalid collection identifier: $raw" >&2
+        continue
+      fi
+      echo "──────────────────────────────────────────────" >&2
+      echo ">>> Resolving collection $cid ..." >&2
+      if [[ "$recurse" == true ]]; then
+        _collect_mod_ids_recursive "$cid"
+      else
+        _collect_mod_ids_direct "$cid"
+      fi
+    done | awk 'NF' | sort -u
+  )
+
+  if [[ ${#all_ids[@]} -eq 0 ]]; then
+    echo "No mods found from provided collection(s)." >&2
+    exit 1
+  fi
+
+  echo "──────────────────────────────────────────────"
+  echo ">>> Found ${#all_ids[@]} mod(s) in collection(s)."
+  printf ' - %s\n' "${all_ids[@]}"
+  if [[ "$verify" == true ]]; then
+    echo "──────────────────────────────────────────────"
+    echo ">>> Verifying Mods directory contains exactly these mods ..."
+    if verify_exact_set "${all_ids[@]}"; then
+      echo "✅ Verification passed: exact match."
+      exit 0
+    else
+      status=$?
+      echo "❌ Verification failed."
+      exit "$status"
+    fi
+  elif [[ "$dryrun" == true ]]; then
+    echo "Dry run: not installing."
+  elif [[ "$install_missing" == true ]]; then
+    echo "──────────────────────────────────────────────"
+    echo ">>> Installing only missing mods ..."
+    mods_dir="$HOME/Games/rimworld/drive_c/Program Files (x86)/RimWorld/Mods"
+    mkdir -p "$mods_dir"
+    mapfile -t installed_names < <(find "$mods_dir" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | LC_ALL=C sort -u)
+    tmp_installed=$(mktemp)
+    printf '%s\n' "${installed_names[@]}" >"$tmp_installed"
+    base=""
+    if base=$(resolve_workshop_base); then :; else base=""; fi
+    missing_ids=()
+    for id in "${all_ids[@]}"; do
+      name="mod_${id}"
+      if [[ -n "$base" && -d "$base/$id" ]]; then
+        name=$(mod_name_from_about "$base/$id" "$id")
+      fi
+      if ! grep -Fxq -- "$name" "$tmp_installed"; then
+        missing_ids+=("$id")
+      fi
+    done
+    rm -f "$tmp_installed"
+    if [[ ${#missing_ids[@]} -eq 0 ]]; then
+      echo "✅ Nothing to install. All mods present."
+      exit 0
+    fi
+    echo ">>> Missing ${#missing_ids[@]} mod(s). Installing:"
+    printf ' - %s\n' "${missing_ids[@]}"
+    "$SCRIPT_DIR/rim-mod" "${missing_ids[@]}"
+  else
+    echo "──────────────────────────────────────────────"
+    echo ">>> Installing all mods via rim-mod ..."
+    "$SCRIPT_DIR/rim-mod" "${all_ids[@]}"
+  fi
+
+  echo "──────────────────────────────────────────────"
+  echo "All mods from collection(s) processed."
+}
+
+main "$@"

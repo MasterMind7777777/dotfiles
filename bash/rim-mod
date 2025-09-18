@@ -63,14 +63,18 @@ main() {
     if [[ -f "$about" ]]; then
       local n
       # shellcheck disable=SC2016
-      n=$(grep -oPm1 '(?<=<name>)[^<]+' "$about" 2>/dev/null | tr -d $'\r' | sed 's/[[:space:]]\+$//')
+      n=$(grep -oPm1 '(?<=<name>)[^<]+' "$about" 2>/dev/null | tr -d $'\r' | sed 's/[[:space:]]\+$//' || true)
       [[ -n "$n" ]] && modname="$n"
     fi
+
+    # Sanitize destination folder name (replace path separators, trim spaces)
+    modname=$(echo -n "$modname" | sed -E 's#[/\\]+# - #g; s/  +/ /g; s/^[[:space:]]+|[[:space:]]+$//g')
 
     local dest="$mods_dir/$modname"
     echo ">>> Installing to: $dest"
     mkdir -p "$mods_dir"
     rm -rf "$dest"
+    mkdir -p "$dest"
     rsync -a --delete "$src"/ "$dest"/
 
     if [[ -d "$dest" ]]; then
@@ -85,4 +89,3 @@ main() {
 }
 
 main "$@"
-

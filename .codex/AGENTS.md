@@ -4,12 +4,15 @@ This file sets personal defaults for how the agent should operate across project
 
 ## Trigger Phrases
 
+- Scope: Trigger phrases apply only to the assistant’s next turn. They are single‑turn directives. If a subsequent user message does not include a trigger phrase, the assistant returns to default mode.
+
 - "use web": When I say this, use the Playwright MCP web-browsing tools configured as `mcp_servers.playwright` to research or extract information. If no URL is given, ask for a URL or a short query and proceed. Prefer searching and reading pages; avoid logging into sites, submitting forms, or performing irreversible actions unless I explicitly ask.
   - Always summarize findings succinctly and include the source URLs.
   - Keep network usage minimal and relevant to the task.
 
 - "use commit": Only commit when I explicitly say this. Until then, propose patches and show diffs without committing.
   - When I say "use commit", stage only files relevant to the task and ask for (or confirm) the commit message before committing.
+  - Dont ask for confirmation if i say use commit you are free to commit
   - Never push unless I explicitly request it.
 
 - "use img": When I say this, locate and use my latest screenshot from `~/Pictures/Screenshots`.
@@ -30,12 +33,23 @@ This file sets personal defaults for how the agent should operate across project
   - Capture both stdout and stderr to a `/tmp` log; parse afterward with `rg`/`sed`/`awk` based on the goal.
   - Treat a non-zero exit as a valid outcome; report status and findings explicitly.
 
+- Explicit: "use tool <x> to <y>": When I explicitly instruct to use a tool (e.g., "use tool ssh to check host", "use tool docker compose to view logs"), assume the tool is installed and proceed to run it to perform the requested action.
+  - Only two acceptable outcomes:
+    - Tool executed and produced a result (success or actionable error output).
+    - Tool invocation failed due to unavailability (e.g., `command not found`); then promptly ask me to verify installation, quoting the exact error seen.
+  - Do not refuse or hesitate preemptively; attempt the command first. Skip preliminary `command -v` checks for explicitly requested tools.
+
+- "go for it": Begin implementing immediately using any necessary tools and file edits to accomplish the agreed task. Do not hesitate or over-ask; act decisively within the discussed approach.
+  - Use available tools and perform writes/edits as needed, respecting the current approval policy and sandbox constraints.
+  - Still honor “No Unrelated Refactors” and avoid scope creep—do only what’s required to complete the task and its direct dependencies.
+  - If an operation would be destructive or ambiguous, confirm briefly; otherwise proceed.
+
 ## Event-Driven Triggers
 
 - Preferred: single streaming command that self-terminates
   - Run one long-lived command that follows logs and exits on the first matching line.
   - Example shell call:
-    - command: ["bash","-lc","docker compose logs -f backend | grep -m1 -E '[Ee]rror.*xyz'"]
+    - command: ["bash","-lc","docker compose logs -f backend | grep -m1 -E '[Ee]rror.\*xyz'"]
     - timeout_ms: use a large value (e.g., `7_200_000` for 2 hours).
   - Rationale: streams output continuously and finishes exactly when the event appears, avoiding repeated "logs → sleep → logs".
 
@@ -50,7 +64,7 @@ This file sets personal defaults for how the agent should operate across project
     - `grep -a` to treat as text.
     - `grep --line-buffered` (when available) to reduce buffering.
   - Consider an `awk` alternative if `grep` options are unavailable:
-    - command: ["bash","-lc","docker compose logs -f backend | awk '/[Ee]rror.*xyz/ { print; exit }'"]
+    - command: ["bash","-lc","docker compose logs -f backend | awk '/[Ee]rror.\*xyz/ { print; exit }'"]
 
 - Optional: interactive/attached sessions (if supported)
   - Start a single log-following session and monitor its output; terminate the session when the target event appears.
@@ -140,8 +154,43 @@ This file sets personal defaults for how the agent should operate across project
 - Never use `sudo`. It is unavailable and will hang the session; I would need to restart.
 - If a needed command is missing, ask me to install it (installing typically requires sudo). Include the command name and suggested package when asking.
 - If an operation requires `sudo`, ask me to run it and provide the exact command and paste back the full output. Include why it’s needed and the expected outcome.
-- Prefer confirming availability with `command -v <cmd>` before relying on a tool.
+- Prefer confirming availability with `command -v <cmd>` before relying on a tool, except when I explicitly say "use tool <x>"—in that case attempt immediate execution first and only fall back to asking if the command truly is missing.
 - Respect active triggers: when "use plan only" is active, run only read-only commands per that section.
+
+### Explicit Tool Invocation Guarantees
+
+- Trust explicit directives: If I say "use tool X to do Y", run the tool to do Y.
+- Acceptable outcomes are limited to:
+  - Ran the tool and returned results (including stderr that informs next steps), or
+  - Received a concrete unavailability error (e.g., `command not found`) and asked me to confirm installation, including the exact command and error text.
+- Do not claim inability or lack of tool without first attempting execution.
+
+## Attempt Before Refusal
+
+- Never claim a tool/command “is not available” without first verifying and attempting a safe invocation.
+  - Check presence: `command -v <cmd>` and/or `<cmd> --version/-V` when available.
+  - If present, run a harmless or dry-run form to validate basic usability (e.g., `ssh -V`; for connectivity, `ssh -o BatchMode=yes -o ConnectTimeout=5 user@host 'true'`).
+  - If the tool lacks a dry-run, prefer the minimal no-op that should succeed under constraints (no sudo, sandbox, approval policy).
+  - On failure, report the exact command attempted, exit code, and a succinct stderr summary; then propose next steps.
+  - Explicit-request exception: When I say "use tool <x>", skip pre-checks and attempt execution first; if and only if it errors as unavailable, ask me to verify installation.
+- Do not assume unavailability due to missing context. If required details are absent (e.g., host, credentials), ask for them and propose the precise test command you will run once provided.
+- Respect safety modes: under "use plan only", perform read-only checks (e.g., `command -v`, `--help`, `--version`) and avoid write/destructive attempts, but still do the verification before saying something cannot be used.
+- Examples:
+  - SSH: try `ssh -V`; if a host/user is provided, attempt a non-interactive `BatchMode` check; otherwise request host/user and key/password details.
+  - CLIs: verify with `--version`/`--help`, then attempt a no-op subcommand if available.
+
+## Scope Discipline (No Unrelated Refactors)
+
+- Stay narrowly focused on the requested task: perform only what I asked, plus strictly necessary dependents/dependencies to keep the code building and the task working.
+- Do not refactor, rewrite, or “improve” unrelated code, even if encountering `TODO`/`FIXME` notes or obviously suboptimal code.
+- Allowed adjustments when required by the task:
+  - Update signatures, imports, and direct call sites impacted by the requested change.
+  - Make minimal edits to tests or configs directly exercising the changed behavior.
+  - Add or update `.env` entries only when new configuration is introduced by the requested change.
+- Prohibited without explicit request:
+  - Drive-by cleanups, stylistic refactors, reorganizing files, or rewriting functions beyond what is necessary for the task to work.
+  - Changing unrelated tests, renaming symbols or files unrelated to the requested change.
+  - Implementing performance or architectural changes not directly required for the task.
 
 ## Command Notes
 
@@ -163,7 +212,7 @@ This file sets personal defaults for how the agent should operate across project
 
 - Always keep `.env` up to date and in sync with variables used in the codebase.
 - If code references an env var that is missing in `.env`, add it immediately with a safe default.
- - Defaults and credentials: use real credentials when already present in context (provided by user, found in code, or existing in `.env`). If a credential is unknown, use a clear placeholder or safe local value. Default features to disabled/off; prefer least‑privilege, non‑destructive settings.
+- Defaults and credentials: use real credentials when already present in context (provided by user, found in code, or existing in `.env`). If a credential is unknown, use a clear placeholder or safe local value. Default features to disabled/off; prefer least‑privilege, non‑destructive settings.
 - Do not hesitate to read `.env`. Read it whenever needed to analyze, configure, or verify values.
 - When introducing new configuration in code, ensure the corresponding `.env` entry exists at the same time.
 - During analysis ("use plan only"), read `.env` and propose additions; avoid writing until changes are approved.
