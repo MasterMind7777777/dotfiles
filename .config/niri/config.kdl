@@ -219,6 +219,9 @@ spawn-at-startup "xwayland-satellite"
 // Notifications (swaync)
 spawn-at-startup "swaync"
 
+// ntfy server for Codex notifications
+spawn-at-startup "ntfy" "serve" "-c" "/etc/ntfy/server.yml"
+
 // Launch Slack with explicit Wayland/Electron flags and portal hint
 spawn-at-startup "bash" "-lc" "pkill -x slack || true; exec env ELECTRON_OZONE_PLATFORM_HINT=wayland OZONE_PLATFORM=wayland GTK_USE_PORTAL=1 /usr/bin/slack --enable-features=UseOzonePlatform,WaylandWindowDecorations,WebRTCPipeWireCapturer --ozone-platform=wayland"
 // Wallpaper via swaybg (per-output)

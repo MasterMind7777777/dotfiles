@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
-"""Codex → swaync notifier with custom sound."""
+"""Codex → swaync notifier with custom sound + ntfy push.
+
+Adds optional posting to an ntfy topic, configurable via env vars:
+
+- NTFY_URL (default: http://192.168.0.92:2586)
+- NTFY_TOPIC (default: codex)
+- NTFY_ENABLED (default: 1)
+
+If enabled and reachable, the script will HTTP POST the composed title/body
+to the topic in addition to the local desktop notification.
+"""
 
 from __future__ import annotations
 
@@ -13,6 +23,7 @@ import sys
 import wave
 from datetime import datetime
 from pathlib import Path
+from urllib import request, error as urlerror
 
 
 CACHE_DIR = Path.home() / ".cache" / "codex"
@@ -24,6 +35,11 @@ BEEP_PATH = CACHE_DIR / "notify-beep.wav"
 APP_NAME = "Codex CLI"
 APP_ICON = "dialog-information"
 EXPIRE_TIMEOUT_MS = 10000
+
+# ntfy configuration (can be overridden via environment variables)
+NTFY_URL = os.environ.get("NTFY_URL", "http://192.168.0.92:2586").rstrip("/")
+NTFY_TOPIC = os.environ.get("NTFY_TOPIC", "codex").strip("/") or "codex"
+NTFY_ENABLED = os.environ.get("NTFY_ENABLED", "1") not in {"0", "false", "False", "no", ""}
 
 
 def _log(message: str) -> None:
@@ -133,6 +149,25 @@ def _play_sound() -> None:
         _log(f"failed to play sound: {exc}")
 
 
+def _post_ntfy(title: str, body: str) -> None:
+    if not NTFY_ENABLED:
+        return
+    url = f"{NTFY_URL}/{NTFY_TOPIC}"
+    # Compose a concise message: prefer title; include body on a new line if present.
+    message = title if not body else f"{title}\n{body}"
+    data = message.encode("utf-8", errors="ignore")
+    req = request.Request(url, data=data, method="POST")
+    req.add_header("Content-Type", "text/plain; charset=utf-8")
+    try:
+        with request.urlopen(req, timeout=3) as resp:
+            # 2xx indicates success; capture minimal info for the log
+            _log(f"ntfy posted: {resp.status} {resp.reason} -> {url}")
+    except urlerror.URLError as exc:
+        _log(f"ntfy post failed: {exc}")
+    except Exception as exc:  # pragma: no cover - defensive
+        _log(f"ntfy unexpected error: {exc}")
+
+
 def _send_notification(title: str, body: str) -> None:
     gdbus = shutil.which("gdbus")
     if not gdbus:
@@ -183,6 +218,7 @@ def _handle_payload(raw: str) -> None:
 
     _play_sound()
     _send_notification(title, body)
+    _post_ntfy(title, body)
 
 
 def _usage() -> None:
