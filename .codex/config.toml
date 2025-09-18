@@ -1,3 +1,6 @@
+model = "gpt-5-codex"
+# Use swaync via notify-send for Codex notifications
+notify = ["python3", "/home/mastermind/dotfiles/bash/notifications/codex_notify.py"]
 # ~/.codex/config.toml
 
 # Optional: Set default model or other global settings here
@@ -11,3 +14,6 @@ args = ["-y", "@playwright/mcp@latest"]
 [mcp_servers.mui-mcp]
 command = "npx"
 args = ["-y", "@mui/mcp@latest"]
+
+[projects."/home/mastermind"]
+trust_level = "trusted"
