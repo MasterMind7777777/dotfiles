@@ -1,6 +1,7 @@
-model = "gpt-5-codex"
+model = "gpt-5"
 # Use swaync via notify-send for Codex notifications
 notify = ["python3", "/home/mastermind/dotfiles/bash/notifications/codex_notify.py"]
+model_reasoning_effort = "minimal"
 # ~/.codex/config.toml
 
 # Optional: Set default model or other global settings here
