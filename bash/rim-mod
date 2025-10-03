@@ -40,13 +40,55 @@ main() {
       "$HOME/.local/share/Steam/steamapps/workshop/content/$appid/$modid"
     )
 
-    # Resolve first existing path
+    # Resolve path containing the newest versioned folder
     local src=""
+    local src_best_version="0"
     local p
     for p in "${candidates[@]}"; do
-      if [[ -d "$p" ]]; then
+      [[ -d "$p" ]] || continue
+
+      local best_version="0"
+      local version_dirs
+      version_dirs=$(find "$p" -maxdepth 1 -mindepth 1 -type d -printf '%f\n' 2>/dev/null | grep -E '^[0-9]+(\.[0-9]+)*$' | sort -V | tail -n1 || true)
+      [[ -n "$version_dirs" ]] && best_version="$version_dirs"
+
+      if [[ "$src" == "" ]]; then
         src="$p"
-        break
+        src_best_version="$best_version"
+        continue
+      fi
+
+      if [[ "$best_version" != "$src_best_version" ]]; then
+        local top
+        top=$(printf '%s\n%s\n' "$src_best_version" "$best_version" | sort -V | tail -n1)
+        if [[ "$top" == "$best_version" ]]; then
+          src="$p"
+          src_best_version="$best_version"
+        fi
+        continue
+      fi
+
+      # Tie-breaker: prefer newest About.xml timestamp when versions match
+      local about="$p/About/About.xml"
+      local about_src="$src/About/About.xml"
+      if [[ -f "$about" && -f "$about_src" ]]; then
+        local mtime_about mtime_src
+        mtime_about=$(stat -c '%Y' "$about" 2>/dev/null || echo 0)
+        mtime_src=$(stat -c '%Y' "$about_src" 2>/dev/null || echo 0)
+        if (( mtime_about > mtime_src )); then
+          src="$p"
+          src_best_version="$best_version"
+          continue
+        fi
+      fi
+
+      # Fallback tie-breaker: newer directory mtime
+      local mtime_dir mtime_dir_src
+      mtime_dir=$(stat -c '%Y' "$p" 2>/dev/null || echo 0)
+      mtime_dir_src=$(stat -c '%Y' "$src" 2>/dev/null || echo 0)
+      if (( mtime_dir > mtime_dir_src )); then
+        src="$p"
+        src_best_version="$best_version"
       fi
     done
 

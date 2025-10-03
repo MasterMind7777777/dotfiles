@@ -11,6 +11,7 @@ Usage: rim-modpack [options] <WorkshopCollectionID | WorkshopURL> [more IDs/URLs
 Options:
   -n, --dry-run          List resolved mod IDs; do not install
   -r, --recurse          Include nested collections (type 2)
+  -c, --clean            Remove Mods entries not in the collection
   -v, --verify           Check Mods folder contains exactly these mods
   -i, --install-missing  Install only missing mods (skip ones present)
   -h, --help             Show this help
@@ -122,6 +123,53 @@ mod_name_from_about() {
   printf '%s' "$name" | sed -E 's#[/\\]+# - #g; s/  +/ /g; s/^[[:space:]]+|[[:space:]]+$//g'
 }
 
+collect_expected_names() {
+  local out_ref="$1"
+  local fallback_ref="$2"
+  shift 2
+  local -n out_arr="$out_ref"
+  local -n fallback_flag="$fallback_ref"
+  local -a ids=("$@")
+  out_arr=()
+  fallback_flag=false
+
+  local base=""
+  if base=$(resolve_workshop_base); then :; else
+    base=""
+    fallback_flag=true
+  fi
+
+  local id
+  for id in "${ids[@]}"; do
+    local name="mod_${id}"
+    if [[ -n "$base" && -d "$base/$id" ]]; then
+      name=$(mod_name_from_about "$base/$id" "$id")
+    else
+      fallback_flag=true
+    fi
+    out_arr+=("$name")
+  done
+}
+
+PROTECTED_MOD_NAMES=(
+  "Core"
+  "Royalty"
+  "Ideology"
+  "Biotech"
+  "Anomaly"
+)
+
+is_protected_mod_name() {
+  local candidate="$1"
+  local protected
+  for protected in "${PROTECTED_MOD_NAMES[@]}"; do
+    if [[ "$candidate" == "$protected" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
 # Verify that Mods directory has exactly the resolved set
 verify_exact_set() {
   local -a ids=("$@")
@@ -132,46 +180,47 @@ verify_exact_set() {
     return 2
   fi
 
-  local base
-  if ! base=$(resolve_workshop_base); then
-    echo "Workshop content path not found for app 294100" >&2
+  local -a expected_names=()
+  local expected_fallback=false
+  collect_expected_names expected_names expected_fallback "${ids[@]}"
+
+  if [[ "$expected_fallback" == true ]]; then
+    echo "Unable to resolve workshop mod names for verification." >&2
+    echo "Ensure rim-mod has downloaded each mod (steamcmd cache present)." >&2
     return 2
   fi
 
-  # Build expected names by reading About.xml under workshop base
-  local expected_names_file
-  expected_names_file=$(mktemp)
-  local id
-  for id in "${ids[@]}"; do
-    local src="$base/$id"
-    if [[ ! -d "$src" ]]; then
-      echo "WARNING: workshop source missing for id=$id at $src" >&2
-    fi
-    local name
-    name=$(mod_name_from_about "$src" "$id")
-    printf '%s\n' "$name" >>"$expected_names_file"
+  mapfile -t expected_sorted < <(printf '%s\n' "${expected_names[@]}" | LC_ALL=C sort -u)
+  mapfile -t installed_sorted < <(find "$mods_dir" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | LC_ALL=C sort -u)
+
+  declare -A expected_set=()
+  declare -A installed_set=()
+  local name
+  for name in "${expected_sorted[@]}"; do
+    expected_set["$name"]=1
+  done
+  for name in "${installed_sorted[@]}"; do
+    installed_set["$name"]=1
   done
 
-  # Installed names = basenames of directories under Mods
-  local installed_names_file
-  installed_names_file=$(mktemp)
-  find "$mods_dir" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | LC_ALL=C sort -u >"$installed_names_file"
-
-  # Sort expected
-  LC_ALL=C sort -u -o "$expected_names_file" "$expected_names_file"
-
-  # Compute differences
-  local missing_file extra_file
-  missing_file=$(mktemp)
-  extra_file=$(mktemp)
-  comm -23 "$expected_names_file" "$installed_names_file" >"$missing_file"  # in expected, not installed
-  comm -13 "$expected_names_file" "$installed_names_file" >"$extra_file"    # in installed, not expected
+  local -a missing=()
+  local -a extra=()
+  for name in "${expected_sorted[@]}"; do
+    if [[ -z "${installed_set[$name]+x}" ]]; then
+      missing+=("$name")
+    fi
+  done
+  for name in "${installed_sorted[@]}"; do
+    if [[ -z "${expected_set[$name]+x}" ]]; then
+      extra+=("$name")
+    fi
+  done
 
   local expected_count installed_count missing_count extra_count
-  expected_count=$(wc -l <"$expected_names_file" | tr -d ' ')
-  installed_count=$(wc -l <"$installed_names_file" | tr -d ' ')
-  missing_count=$(wc -l <"$missing_file" | tr -d ' ')
-  extra_count=$(wc -l <"$extra_file" | tr -d ' ')
+  expected_count=${#expected_sorted[@]}
+  installed_count=${#installed_sorted[@]}
+  missing_count=${#missing[@]}
+  extra_count=${#extra[@]}
 
   echo "Verification summary:"
   echo " - expected mods: $expected_count"
@@ -181,19 +230,83 @@ verify_exact_set() {
 
   if [[ "$missing_count" -gt 0 ]]; then
     echo "Missing (expected but not installed):"
-    sed -n '1,200p' "$missing_file"
+    printf ' - %s\n' "${missing[@]}"
   fi
   if [[ "$extra_count" -gt 0 ]]; then
     echo "Extra (installed but not expected):"
-    sed -n '1,200p' "$extra_file"
+    printf ' - %s\n' "${extra[@]}"
   fi
 
-  # Exit non-zero if not exact match
   if [[ "$missing_count" -eq 0 && "$extra_count" -eq 0 ]]; then
     return 0
   else
     return 3
   fi
+}
+
+prune_extra_mods() {
+  local dryrun_flag="$1"
+  shift
+  local -a ids=("$@")
+  local mods_dir="$HOME/Games/rimworld/drive_c/Program Files (x86)/RimWorld/Mods"
+
+  if [[ ! -d "$mods_dir" ]]; then
+    echo "Mods directory missing: $mods_dir"
+    echo "Nothing to clean."
+    return 0
+  fi
+
+  local -a expected_names=()
+  local expected_fallback=false
+  collect_expected_names expected_names expected_fallback "${ids[@]}"
+  mapfile -t expected_sorted < <(printf '%s\n' "${expected_names[@]}" | LC_ALL=C sort -u)
+  declare -A expected_set=()
+  local name
+  for name in "${expected_sorted[@]}"; do
+    expected_set["$name"]=1
+  done
+
+  mapfile -t installed_sorted < <(find "$mods_dir" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | LC_ALL=C sort -u)
+  local -a extras=()
+  local -a skipped=()
+  for name in "${installed_sorted[@]}"; do
+    if [[ -n "${expected_set[$name]+x}" ]]; then
+      continue
+    fi
+    if is_protected_mod_name "$name"; then
+      skipped+=("$name")
+      continue
+    fi
+    extras+=("$name")
+  done
+
+  if [[ ${#extras[@]} -eq 0 ]]; then
+    echo "No extra mods to remove."
+  else
+    local action="Removing"
+    if [[ "$dryrun_flag" == true ]]; then
+      action="Would remove"
+    fi
+    printf '%s %d mod(s):\n' "$action" "${#extras[@]}"
+    printf ' - %s\n' "${extras[@]}"
+    if [[ "$dryrun_flag" != true ]]; then
+      local target
+      for target in "${extras[@]}"; do
+        rm -rf "$mods_dir/$target"
+      done
+    fi
+  fi
+
+  if [[ ${#skipped[@]} -gt 0 ]]; then
+    echo "Skipped protected mods:"
+    printf ' - %s\n' "${skipped[@]}"
+  fi
+
+  if [[ "$expected_fallback" == true ]]; then
+    echo "Note: Some mod names were unresolved; replacements will be reinstalled by rim-mod." >&2
+  fi
+
+  return 0
 }
 
 main() {
@@ -206,6 +319,7 @@ main() {
   local dryrun=false
   local verify=false
   local install_missing=false
+  local clean=false
 
   # Parse flags
   while [[ $# -gt 0 ]]; do
@@ -214,6 +328,8 @@ main() {
         recurse=true; shift ;;
       -n|--dry-run)
         dryrun=true; shift ;;
+      -c|--clean|--prune)
+        clean=true; shift ;;
       -v|--verify)
         verify=true; shift ;;
       -i|--install-missing)
@@ -261,6 +377,18 @@ main() {
   echo "──────────────────────────────────────────────"
   echo ">>> Found ${#all_ids[@]} mod(s) in collection(s)."
   printf ' - %s\n' "${all_ids[@]}"
+
+  if [[ "$clean" == true && "$verify" == true ]]; then
+    echo "Cannot combine --clean with --verify (verify is read-only)." >&2
+    exit 2
+  fi
+
+  if [[ "$clean" == true ]]; then
+    echo "──────────────────────────────────────────────"
+    echo ">>> Cleaning Mods directory to match resolved mods ..."
+    prune_extra_mods "$dryrun" "${all_ids[@]}"
+  fi
+
   if [[ "$verify" == true ]]; then
     echo "──────────────────────────────────────────────"
     echo ">>> Verifying Mods directory contains exactly these mods ..."
