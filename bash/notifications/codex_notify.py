@@ -195,8 +195,13 @@ def _send_notification(title: str, body: str) -> None:
     ]
 
     try:
-        raw = subprocess.check_output(args, text=True)
-        _log(f"notification dispatched: {raw.strip()}")
+        subprocess.run(
+            args,
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        _log("notification dispatched")
     except subprocess.CalledProcessError as exc:
         _log(f"failed to send notification: {exc}")
 
@@ -222,18 +227,19 @@ def _handle_payload(raw: str) -> None:
 
 
 def _usage() -> None:
-    print("Usage: codex_notify.py <NOTIFICATION_JSON>", file=sys.stderr)
+    _log("Usage: codex_notify.py <NOTIFICATION_JSON>")
 
 
 def main(argv: list[str]) -> int:
     if len(argv) != 2:
         _usage()
-        return 1
+        # Exit cleanly without writing to stderr to avoid polluting Codex.
+        return 0
 
     try:
         _handle_payload(argv[1])
     except json.JSONDecodeError:
-        print("Invalid notification payload", file=sys.stderr)
+        _log("Invalid notification payload")
         return 1
     return 0
 
