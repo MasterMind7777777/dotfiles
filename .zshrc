@@ -93,7 +93,8 @@ alias vpnd="/home/mastermind/dotfiles/bash/misc/vpn_disconnect.sh"
 alias treecp="tree -I 'node_modules|dist|target' | wl-copy"
 alias ssh='kitty +kitten ssh'
 alias kthemes='kitty +kitten themes'
-alias vial='/home/mastermind/app_image_lib/Vial-v0.7.1-x86_64.AppImage'
+alias codexc='CODEX_HOME="$PWD/.codex" codexc'
+# alias vial='/home/mastermind/app_image_lib/Vial-v0.7.1-x86_64.AppImage'
 
 # function to git add all and commit with specified message
 gac() {
@@ -135,3 +136,5 @@ export XKB_DEFAULT_LAYOUT="us,ru"
 export GTK_THEME=gruvbox-dark-gtk
 export GTK_ICON_THEME=Colloid-Gruvbox
 export XCURSOR_THEME="Colloid-Gruvbox"
+export PATH="$HOME/bin:$PATH"
+export PATH="$HOME/bin:$PATH"

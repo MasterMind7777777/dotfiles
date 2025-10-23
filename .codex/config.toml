@@ -6,6 +6,8 @@ notify = ["python3", "/home/mastermind/dotfiles/bash/notifications/codex_notify.
 # Optional: Set default model or other global settings here
 # model = "gpt-5"
 # model_provider = "azure"
+approval_policy = "on-request"
+sandbox_mode = "danger-full-access"
 
 [mcp_servers.playwright]
 command = "npx"
@@ -16,4 +18,7 @@ command = "npx"
 args = ["-y", "@mui/mcp@latest"]
 
 [projects."/home/mastermind"]
+trust_level = "trusted"
+
+[projects."/home/mastermind/projects/forks/codex"]
 trust_level = "trusted"
