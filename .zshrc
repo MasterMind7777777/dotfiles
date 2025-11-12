@@ -102,6 +102,13 @@ gac() {
 }
 
 
+# fzf history -> put selected command into the prompt (no output, no exec)
+fzfh() {
+  local cmd
+  cmd=$(fc -ln 1 | fzf --tac --no-sort --ansi --prompt='history> ' --height=80%) || return
+  print -z -- "$cmd"   # queue into ZLE buffer so you can edit/enter
+}
+
 # rim-mod moved to standalone script in ~/dotfiles/bash
 # call: rim-mod <WorkshopModID | WorkshopURL> [more IDs/URLs]
 

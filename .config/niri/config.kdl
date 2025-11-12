@@ -231,6 +231,11 @@ spawn-at-startup "swaybg" "-m" "fill" "-o" "eDP-1" "-i" "/home/mastermind/.local
 // WINDOW RULES (float/size/placement like your Hyprland rules)
 // ───────────────────────────────────────────────────────────────────────────────
 window-rule {
+  match is-window-cast-target=true
+  opacity 1.0
+}
+
+window-rule {
   geometry-corner-radius 10
   clip-to-geometry true
 }
@@ -350,6 +355,11 @@ binds {
     Mod+Ctrl+F {
         expand-column-to-available-width
     }
+
+    // Dynamic Cast Target: steer what’s being shared, live
+    Mod+Shift+W { set-dynamic-cast-window; }
+    Mod+Shift+M { set-dynamic-cast-monitor; }
+    Mod+Shift+C { clear-dynamic-cast-target; }
 
     // Centering
     Mod+C {
