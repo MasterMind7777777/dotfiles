@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
-# install-codex.sh — Fetch latest Codex CLI and install it (system-wide by default).
+# install-codex.sh — Fetch latest Codex CLI and install it.
 # Usage:
-#   ./install-codex.sh                      # install to /usr/local/bin (uses sudo if needed)
-#   DEST=/usr/local/bin ./install-codex.sh  # change install dir
+#   ./install-codex.sh                      # install to /usr/local/bin (prompts for sudo if needed)
+#   DEST=/some/bin ./install-codex.sh       # change install dir (e.g. $HOME/.local/bin)
 #   ./install-codex.sh --pre                # allow latest pre-release
 #   ./install-codex.sh --force              # overwrite existing binary
 
@@ -27,10 +27,10 @@ while [ $# -gt 0 ]; do
   shift || true
 done
 
-# OS triple (Linux = musl builds)
+# OS triple (Linux: try musl first, then gnu)
 case "$(uname -s)" in
-  Linux)  os_tag="unknown-linux-musl" ;;
-  Darwin) os_tag="apple-darwin" ;;
+  Linux)  os_tags="unknown-linux-musl unknown-linux-gnu" ;;
+  Darwin) os_tags="apple-darwin" ;;
   *) echo "Unsupported OS: $(uname -s)" >&2; exit 1 ;;
 esac
 
@@ -45,25 +45,52 @@ need_cmd() { command -v "$1" >/dev/null 2>&1 || { echo "Missing dependency: $1" 
 need_cmd curl
 need_cmd tar
 need_cmd grep
-need_cmd awk
+need_cmd sed
 need_cmd install
 
-sudo_if_needed() {
-  if [ -w "$1" ] 2>/dev/null; then
-    # Writable; no sudo
-    shift
-    "$@"
-  else
-    if command -v sudo >/dev/null 2>&1; then
-      echo "Elevating with sudo to write to $1…"
-      shift
-      sudo "$@"
-    else
-      echo "Destination $1 not writable and 'sudo' not found." >&2
-      echo "Re-run with: DEST=\$HOME/.local/bin ./install-codex.sh  (or run as root)" >&2
-      exit 1
-    fi
+extract_asset_urls() {
+  # Avoid line-based parsing: GitHub may return minified JSON (single line).
+  if command -v jq >/dev/null 2>&1; then
+    jq -r '.. | .browser_download_url? // empty'
+    return 0
   fi
+
+  grep -oE '"browser_download_url"[[:space:]]*:[[:space:]]*"[^"]+"' \
+    | sed -E 's/^"browser_download_url"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/'
+}
+
+prompt_sudo() {
+  # Use /dev/tty so the prompt still works even if stdin is redirected.
+  command -v sudo >/dev/null 2>&1 || return 1
+  [ -t 1 ] || return 1
+  if [ -r /dev/tty ]; then
+    printf "%s" "$1" >&2
+    read -r ans </dev/tty || return 1
+  else
+    [ -t 0 ] || return 1
+    printf "%s" "$1" >&2
+    read -r ans || return 1
+  fi
+  case "$ans" in
+    y|Y|yes|YES) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+mkdir_dest_if_needed() {
+  [ -d "$DEST" ] && return 0
+  parent="$(dirname "$DEST")"
+  if [ -w "$parent" ] 2>/dev/null; then
+    install -d -m 0755 "$DEST"
+    return 0
+  fi
+  if prompt_sudo "DEST=$DEST requires elevation to create. Run 'sudo install -d' ? [y/N] "; then
+    sudo install -d -m 0755 "$DEST"
+    return 0
+  fi
+  echo "Cannot create DEST=$DEST (parent not writable)." >&2
+  echo "Re-run with: DEST=\$HOME/.local/bin ./install-codex.sh  (or run as root)" >&2
+  exit 1
 }
 
 tmpdir="$(mktemp -d)"
@@ -76,17 +103,22 @@ else
   json="$(curl -fsSL "$API_LATEST")"
 fi
 
-# Extract all asset URLs and pick the first match for our platform
-pattern="codex-${arch_tag}-${os_tag}\\.tar\\.gz$"
-url="$(printf %s "$json" \
-  | awk -F'"' '/browser_download_url/ {print $4}' \
-  | grep -E "$pattern" \
-  | head -n1 || true)"
+# Extract all asset URLs and pick the first match for our platform.
+# Prefer jq if present; otherwise use grep -o so it works on both pretty and minified JSON.
+asset_urls="$(printf %s "$json" | extract_asset_urls || true)"
+url=""
+for os_tag in $os_tags; do
+  pattern="codex-${arch_tag}-${os_tag}\\.tar\\.gz$"
+  url="$(printf %s "$asset_urls" | grep -E "$pattern" | head -n1 || true)"
+  [ -n "$url" ] && break
+done
 
 if [ -z "${url:-}" ]; then
   echo "Could not find an asset matching $pattern in the latest release(s)." >&2
   echo "Available assets were:" >&2
-  printf %s "$json" | awk -F'"' '/browser_download_url/ {print "  - "$4}' >&2
+  if [ -n "${asset_urls:-}" ]; then
+    printf %s "$asset_urls" | sed 's/^/  - /' >&2
+  fi
   exit 1
 fi
 
@@ -98,16 +130,20 @@ echo "Extracting…"
 tar -xzf "$tarball" -C "$tmpdir"
 
 # Find the extracted binary
-bin_path="$(find "$tmpdir" -maxdepth 1 -type f -name 'codex*' | head -n1)"
+bin_path="$(find "$tmpdir" -maxdepth 2 -type f -name 'codex*' \
+  ! -name '*.dmg' \
+  ! -name '*.sigstore' \
+  ! -name '*.tar.gz' \
+  ! -name '*.zip' \
+  ! -name '*.zst' \
+  | head -n1 || true)"
 [ -n "$bin_path" ] || { echo "Failed to locate extracted codex binary." >&2; exit 1; }
 chmod +x "$bin_path"
 
 target="$DEST/codex"
 
 # Prepare destination directory
-if [ ! -d "$DEST" ]; then
-  sudo_if_needed "$(dirname "$DEST")" install -d -m 0755 "$DEST"
-fi
+mkdir_dest_if_needed
 
 # Existing file check
 if [ -e "$target" ] && [ "$FORCE" -ne 1 ]; then
@@ -117,7 +153,17 @@ if [ -e "$target" ] && [ "$FORCE" -ne 1 ]; then
 fi
 
 # Install atomically
-sudo_if_needed "$DEST" install -m 0755 "$bin_path" "$target"
+if [ -w "$DEST" ] 2>/dev/null; then
+  install -m 0755 "$bin_path" "$target"
+else
+  if prompt_sudo "DEST=$DEST is not writable. Install with sudo? [y/N] "; then
+    sudo install -m 0755 "$bin_path" "$target"
+  else
+    echo "DEST=$DEST is not writable." >&2
+    echo "Re-run with: DEST=\$HOME/.local/bin ./install-codex.sh  (or run as root)" >&2
+    exit 1
+  fi
+fi
 
 echo "Installed to: $target"
 ("$target" --version || "$target" -V || true) 2>/dev/null

@@ -109,6 +109,38 @@ fzfh() {
   print -z -- "$cmd"   # queue into ZLE buffer so you can edit/enter
 }
 
+# Vial / Vitaly keyboard profile switcher
+export VIAL_KBD_ID=39192
+export VIAL_PROFILES_DIR="$HOME/keybord-profiles"
+
+_vial_load() {
+  local file="$1"
+  local out unlocked=0
+
+  # 1) Try load, capture output so we can detect "locked"
+  out="$(vitaly -i "$VIAL_KBD_ID" load -f "$file" 2>&1)"
+  print -r -- "$out"
+
+  # 2) If locked, do interactive unlock, then load again
+  if echo "$out" | grep -q "Keyboard is locked"; then
+    echo
+    echo "Keyboard is locked. Unlock now (press the keyboard combo), then I’ll reload…"
+    vitaly -i "$VIAL_KBD_ID" lock -u || return $?
+    unlocked=1
+    vitaly -i "$VIAL_KBD_ID" load -f "$file" || return $?
+  else
+    # If we got any other Error:, fail
+    if echo "$out" | grep -q "^Error:"; then
+      return 1
+    fi
+  fi
+
+  # 3) Skip re-locking to keep keyboard unlocked
+}
+
+klm() { _vial_load "$VIAL_PROFILES_DIR/main.vil.cli"; }
+klg() { _vial_load "$VIAL_PROFILES_DIR/games.vil.cli"; }
+
 # rim-mod moved to standalone script in ~/dotfiles/bash
 # call: rim-mod <WorkshopModID | WorkshopURL> [more IDs/URLs]
 

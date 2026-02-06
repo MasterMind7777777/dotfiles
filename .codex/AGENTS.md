@@ -9,10 +9,13 @@ This file sets personal defaults for how the agent should operate across project
 - "use commit": Only commit when I explicitly say this. Until then, propose patches and show diffs without committing.
   - When I say "use commit", stage only files relevant to the task and ask for (or confirm) the commit message before committing.
   - Dont ask for confirmation if i say use commit you are free to commit
-  - Never push unless I explicitly request it.
 
-- "use img": When I say this, locate and use my latest screenshot from `~/Pictures/Screenshots`.
-  - Determine the latest file by modification time among common image types (e.g., `*.png`, `*.jpg`, `*.jpeg`).
+- "use commit deploy": Commit, push, then deploy.
+  - After committing, push the current branch, SSH to the target server, `cd` into the project, `git pull`, then run the project deployment pipeline (usually `docker compose up -d --build` for one or many affected services).
+  - Ask for (or confirm) the commit message before committing, unless I include "use commit deploy no ask".
+
+- "use commit deploy no ask": Same as "use commit deploy", but for the entire session.
+  - After this trigger, for the rest of the session, whenever you make changes, commit, push, SSH/pull, and run the deployment pipeline without asking for a commit message.
 
 - "use plan only": Enter analysis-and-planning mode; only plan and run read-only commands. Do not edit files or perform write/destructive operations until I lift this mode.
   - Always maintain and update the plan (`update_plan`) while analyzing.
@@ -30,6 +33,12 @@ This file sets personal defaults for how the agent should operate across project
   - Use available tools and perform writes/edits as needed, respecting the current approval policy and sandbox constraints.
   - Still honor “No Unrelated Refactors” and avoid scope creep—do only what’s required to complete the task and its direct dependencies.
   - If an operation would be destructive or ambiguous, confirm briefly; otherwise proceed.
+
+## SSH Conventions
+
+- When I say to SSH into a server and run commands, assume the project is a git clone under `$HOME`.
+- After connecting, `cd <project_name_we_are_working_on>` before running the requested commands.
+- If that fails, use `ls`, `pwd`, and `cd` to locate the correct project directory and proceed.
 
 ## Planning
 
@@ -101,9 +110,11 @@ This file sets personal defaults for how the agent should operate across project
   - Do not run migrations or DDL/DML without explicit approval.
 - When "use plan only" is active, only run read-only queries and meta-commands.
 
-## Environment (.env)
+## Configuration & Secrets
 
-- Always keep `.env` up to date and in sync with variables used in the codebase.
+- Always keep configuration and secrets in git up to date. We use a self‑hosted GitLab, so it is safe and expected to commit required secrets (e.g., `.env`, service account JSON, config files) so they are not lost.
+- If a required config/secret file is missing from git, warn me and suggest committing it and/or adjusting `.gitignore`.
+- Keep `.env` in sync with variables used in the codebase.
 - If code references an env var that is missing in `.env`, add it immediately with a safe default.
 - Defaults and credentials: use real credentials when already present in context (provided by user, found in code, or existing in `.env`). If a credential is unknown, use a clear placeholder or safe local value. Default features to disabled/off; prefer least‑privilege, non‑destructive settings.
 - Do not hesitate to read `.env`. Read it whenever needed to analyze, configure, or verify values.

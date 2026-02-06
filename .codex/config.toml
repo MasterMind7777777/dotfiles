@@ -1,4 +1,4 @@
-model = "gpt-5-codex"
+model = "gpt-5.3-codex"
 # Use swaync via notify-send for Codex notifications
 notify = ["python3", "/home/mastermind/dotfiles/bash/notifications/codex_notify.py"]
 # ~/.codex/config.toml
@@ -8,13 +8,36 @@ notify = ["python3", "/home/mastermind/dotfiles/bash/notifications/codex_notify.
 # model_provider = "azure"
 approval_policy = "on-request"
 sandbox_mode = "danger-full-access"
+model_reasoning_effort = "medium"
+suppress_unstable_features_warning = true
 
 # [mcp_servers.mui-mcp]
 # command = "npx"
 # args = ["-y", "@mui/mcp@latest"]
 
+web_search = "cached"
+personality = "pragmatic"
+
+[features]
+unified_exec = true
+collab = true
+
 [projects."/home/mastermind"]
+trust_level = "trusted"
+
+[projects."/home/mastermind/dotfiles"]
+trust_level = "trusted"
+
+[projects."/home/mastermind/dotfiles/.codex"]
 trust_level = "trusted"
 
 [projects."/home/mastermind/projects/forks/codex"]
 trust_level = "trusted"
+
+[notice]
+hide_gpt5_1_migration_prompt = true
+"hide_gpt-5.1-codex-max_migration_prompt" = true
+
+[notice.model_migrations]
+"gpt-5.2" = "gpt-5.2-codex"
+gpt-5-codex = "gpt-5.2-codex"

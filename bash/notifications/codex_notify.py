@@ -28,7 +28,7 @@ from urllib import request, error as urlerror
 
 CACHE_DIR = Path.home() / ".cache" / "codex"
 LOG_PATH = CACHE_DIR / "notify.log"
-DOWNLOAD_SOUND = Path.home() / "Downloads" / "single-sound-message-icq-ooh.mp3"
+DOWNLOAD_SOUND = Path.home() / "Sounds" / "ICQ_Notification_Sound-642324-mobiles24.mp3"
 SOUND_PATH = CACHE_DIR / DOWNLOAD_SOUND.name
 BEEP_PATH = CACHE_DIR / "notify-beep.wav"
 

@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+##
+## Europa Universalis V – TTY + gamescope launcher
+## Drop this into ~/bin/eu5-tty and:  chmod +x ~/bin/eu5-tty
+## Then switch to a TTY (Ctrl+Alt+F3), log in, and run:  eu5-tty
+##
+
+# --- Paths specific to your setup (from your logs) ---
+GAME_ROOT="$HOME/Games/europa-universalis-v"
+GAME_BIN="$GAME_ROOT/drive_c/Program Files (x86)/Europa Universalis V/binaries"
+GAME_EXE="eu5.exe"
+
+UMU_RUN="$HOME/.local/share/lutris/runtime/umu/umu-run"
+PROTONPATH="$HOME/.local/share/lutris/runners/proton/ge-proton"
+UMU_RUNTIME="$HOME/.local/share/umu/steamrt3"
+
+# --- Basic environment (mirrors what Lutris was using) ---
+export WINEPREFIX="$GAME_ROOT"
+export PROTONPATH
+export STEAM_COMPAT_DATA_PATH="$GAME_ROOT"
+export STEAM_COMPAT_INSTALL_PATH="$GAME_BIN"
+export STEAM_COMPAT_TOOL_PATHS="$PROTONPATH:$UMU_RUNTIME"
+export STEAM_COMPAT_MOUNTS="$PROTONPATH:$UMU_RUNTIME"
+
+# QoL / noise control
+export WINEDEBUG=-all
+export DXVK_LOG_LEVEL=error
+
+# If you don’t have gamemode installed and are tired of warnings,
+# you can either install `gamemode` or set this to empty:
+GAMEMODE_BIN="gamemoderun"   # or "" to disable
+
+# Resolution / refresh for gamescope (tweak as needed)
+WIDTH=1920
+HEIGHT=1200
+REFRESH=60    # you had 30 in the log; 60 is saner unless you want a hard cap
+
+# If you want to force NVIDIA dGPU, wrap gamescope with prime-run here, e.g.:
+# GFX_PREFIX="prime-run"
+GFX_PREFIX=""
+
+cd "$GAME_BIN"
+
+# Build the actual command
+if [[ -n "${GAMEMODE_BIN}" ]]; then
+  GAME_CMD=( "$GAMEMODE_BIN" "$UMU_RUN" "$GAME_BIN/$GAME_EXE" )
+else
+  GAME_CMD=( "$UMU_RUN" "$GAME_BIN/$GAME_EXE" )
+fi
+
+# Run gamescope directly on the TTY (DRM mode)
+exec $GFX_PREFIX gamescope \
+  -w "$WIDTH" -h "$HEIGHT" \
+  -W "$WIDTH" -H "$HEIGHT" \
+  -r "$REFRESH" \
+  -f \
+  --force-grab-cursor \
+  -- \
+  "${GAME_CMD[@]}"
