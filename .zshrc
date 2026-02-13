@@ -139,6 +139,7 @@ _vial_load() {
 }
 
 klm() { _vial_load "$VIAL_PROFILES_DIR/main.vil.cli"; }
+kld() { _vial_load "$VIAL_PROFILES_DIR/dota.vil.cli"; }
 klg() { _vial_load "$VIAL_PROFILES_DIR/games.vil.cli"; }
 
 # rim-mod moved to standalone script in ~/dotfiles/bash

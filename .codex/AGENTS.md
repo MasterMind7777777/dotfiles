@@ -7,15 +7,15 @@ This file sets personal defaults for how the agent should operate across project
 - Scope: Trigger phrases apply only to the assistant’s next turn. They are single‑turn directives. If a subsequent user message does not include a trigger phrase, the assistant returns to default mode.
 
 - "use commit": Only commit when I explicitly say this. Until then, propose patches and show diffs without committing.
-  - When I say "use commit", stage only files relevant to the task and ask for (or confirm) the commit message before committing.
-  - Dont ask for confirmation if i say use commit you are free to commit
+  - When I say "use commit", stage only files relevant to the task and generate a commit message based on the work done before committing.
+  - Do not ask for confirmation on the commit message unless I explicitly request that behavior.
 
 - "use commit deploy": Commit, push, then deploy.
   - After committing, push the current branch, SSH to the target server, `cd` into the project, `git pull`, then run the project deployment pipeline (usually `docker compose up -d --build` for one or many affected services).
-  - Ask for (or confirm) the commit message before committing, unless I include "use commit deploy no ask".
+  - Generate the commit message from the work done. If I provide a specific message, use it as-is.
 
 - "use commit deploy no ask": Same as "use commit deploy", but for the entire session.
-  - After this trigger, for the rest of the session, whenever you make changes, commit, push, SSH/pull, and run the deployment pipeline without asking for a commit message.
+  - After this trigger, for the rest of the session, whenever you make changes, generate the commit message from the work done, then commit, push, SSH/pull, and run the deployment pipeline without asking for a commit message.
 
 - "use plan only": Enter analysis-and-planning mode; only plan and run read-only commands. Do not edit files or perform write/destructive operations until I lift this mode.
   - Always maintain and update the plan (`update_plan`) while analyzing.
