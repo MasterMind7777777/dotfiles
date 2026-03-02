@@ -20,7 +20,7 @@ personality = "pragmatic"
 
 [features]
 unified_exec = true
-collab = true
+multi_agent = true
 
 [projects."/home/mastermind"]
 trust_level = "trusted"

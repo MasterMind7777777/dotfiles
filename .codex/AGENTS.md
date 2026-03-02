@@ -17,6 +17,12 @@ This file sets personal defaults for how the agent should operate across project
 - "use commit deploy no ask": Same as "use commit deploy", but for the entire session.
   - After this trigger, for the rest of the session, whenever you make changes, generate the commit message from the work done, then commit, push, SSH/pull, and run the deployment pipeline without asking for a commit message.
 
+- Optional task ID suffix for git triggers: You may append a task ID at the end of a commit-related trigger (for example, `use commit DTT-10`).
+  - Applies to: `use commit`, `use commit deploy`, and `use commit deploy no ask`.
+  - If a task ID is provided, create commit messages in this format: `<TASK-ID>: <generated message>` (example: `DTT-10: add retry on transfer step`).
+  - After committing, provide the commit link in this format: `http://10.20.1.100/ai_dtt_transfer/orchestrator/-/commit/<full_commit_sha>`.
+  - If no task ID is provided, operate exactly as normal with no additional actions.
+
 - "use plan only": Enter analysis-and-planning mode; only plan and run read-only commands. Do not edit files or perform write/destructive operations until I lift this mode.
   - Always maintain and update the plan (`update_plan`) while analyzing.
   - Allowed examples: `ls`, `cat`, `rg`, `git status`, `git diff`, `git log`, `docker compose ps`, `docker compose logs <service>`, `docker ps`, `docker inspect`.
